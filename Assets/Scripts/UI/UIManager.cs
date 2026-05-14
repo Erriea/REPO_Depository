@@ -1,5 +1,4 @@
 using CaseFileLocalSuspect.Game;
-using TMPro;
 using UnityEngine;
 
 namespace CaseFileLocalSuspect.UI
@@ -13,12 +12,12 @@ namespace CaseFileLocalSuspect.UI
         [SerializeField] private GameObject accusationPanel;
         [SerializeField] private GameObject resultPanel;
 
-        [Header("Shared Text")]
-        [SerializeField] private TMP_Text screenTitleText;
-        [SerializeField] private TMP_Text placeholderMessageText;
-
         [Header("Panel Controllers")]
+        [SerializeField] private PortraitLibrary portraitLibrary;
         [SerializeField] private CaseBriefingPanelUI caseBriefingPanelUI;
+        [SerializeField] private InterrogationPanelUI interrogationPanelUI;
+        [SerializeField] private AccusationPanelUI accusationPanelUI;
+        [SerializeField] private ResultPanelUI resultPanelUI;
 
         public void ShowScreen(GameScreen screen)
         {
@@ -27,28 +26,13 @@ namespace CaseFileLocalSuspect.UI
             SetPanelActive(interrogationPanel, screen == GameScreen.Interrogation);
             SetPanelActive(accusationPanel, screen == GameScreen.Accusation);
             SetPanelActive(resultPanel, screen == GameScreen.Result);
-
-            UpdatePlaceholderText(screen);
         }
 
         public void ShowCaseBriefing(CaseFile caseFile)
         {
             if (caseBriefingPanelUI != null)
             {
-                caseBriefingPanelUI.ShowCase(caseFile);
-            }
-        }
-
-        private void UpdatePlaceholderText(GameScreen screen)
-        {
-            if (screenTitleText != null)
-            {
-                screenTitleText.text = GetScreenTitle(screen);
-            }
-
-            if (placeholderMessageText != null)
-            {
-                placeholderMessageText.text = GetPlaceholderMessage(screen);
+                caseBriefingPanelUI.ShowCase(caseFile, portraitLibrary);
             }
         }
 
@@ -60,41 +44,43 @@ namespace CaseFileLocalSuspect.UI
             }
         }
 
-        private static string GetScreenTitle(GameScreen screen)
+        public void ShowInterrogation(CaseFile caseFile, int selectedSuspectIndex, int questionsRemaining, string conversationHistory, bool canAskQuestions)
         {
-            switch (screen)
+            if (interrogationPanelUI != null)
             {
-                case GameScreen.MainMenu:
-                    return "CaseFile: Local Suspect";
-                case GameScreen.CaseBriefing:
-                    return "Case Briefing";
-                case GameScreen.Interrogation:
-                    return "Interrogation";
-                case GameScreen.Accusation:
-                    return "Accusation";
-                case GameScreen.Result:
-                    return "Result";
-                default:
-                    return "CaseFile: Local Suspect";
+                interrogationPanelUI.ShowState(caseFile, portraitLibrary, selectedSuspectIndex, questionsRemaining, conversationHistory, canAskQuestions);
             }
         }
 
-        private static string GetPlaceholderMessage(GameScreen screen)
+        public void ClearQuestionInput()
         {
-            switch (screen)
+            if (interrogationPanelUI != null)
             {
-                case GameScreen.MainMenu:
-                    return "Start a new case to begin the investigation.";
-                case GameScreen.CaseBriefing:
-                    return "Milestone 3 will populate this screen with the crime summary and suspect cards.";
-                case GameScreen.Interrogation:
-                    return "Milestone 4 will add suspect questions and conversation history here.";
-                case GameScreen.Accusation:
-                    return "Milestone 5 will let the player accuse a suspect here.";
-                case GameScreen.Result:
-                    return "Milestone 5 will show the accusation result and explanation here.";
-                default:
-                    return string.Empty;
+                interrogationPanelUI.ClearQuestionInput();
+            }
+        }
+
+        public void ShowInterrogationMessage(string message)
+        {
+            if (interrogationPanelUI != null)
+            {
+                interrogationPanelUI.ShowHint(message);
+            }
+        }
+
+        public void ShowAccusation(CaseFile caseFile, int selectedAccusationIndex)
+        {
+            if (accusationPanelUI != null)
+            {
+                accusationPanelUI.ShowChoices(caseFile, portraitLibrary, selectedAccusationIndex);
+            }
+        }
+
+        public void ShowResult(CaseFile caseFile, int accusedIndex, bool isCorrect)
+        {
+            if (resultPanelUI != null)
+            {
+                resultPanelUI.ShowResult(caseFile, portraitLibrary, accusedIndex, isCorrect);
             }
         }
     }

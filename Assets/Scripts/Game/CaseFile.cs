@@ -8,6 +8,7 @@ namespace CaseFileLocalSuspect.Game
         public string caseTitle;
         public string crime;
         public string victim;
+        public string victimPortraitId;
         public string location;
         public Suspect[] suspects;
         public string guiltySuspect;

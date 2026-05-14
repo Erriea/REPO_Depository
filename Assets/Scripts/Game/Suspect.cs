@@ -6,6 +6,7 @@ namespace CaseFileLocalSuspect.Game
     public class Suspect
     {
         public string name;
+        public string portraitId;
         public string role;
         public string motive;
         public string alibi;
