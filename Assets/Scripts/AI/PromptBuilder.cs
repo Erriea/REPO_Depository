@@ -19,14 +19,19 @@ namespace CaseFileLocalSuspect.AI
             "a murder in a railway station office"
         };
 
-        public static string BuildCaseGenerationPrompt(int caseNumber, int varietySeed)
+        public static string BuildCaseGenerationPrompt(int caseNumber, int varietySeed, string previousCaseTitle)
         {
             string chosenTheme = CaseThemes[System.Math.Abs(varietySeed) % CaseThemes.Length];
+            string repetitionGuard = string.IsNullOrWhiteSpace(previousCaseTitle)
+                ? string.Empty
+                : $"Do not reuse or closely imitate the previous case titled \"{previousCaseTitle}\". ";
 
             return
                 $"Create a fictional detective case for a Unity game. This is case run {caseNumber} with variation seed {varietySeed}. " +
                 $"Use this case theme: {chosenTheme}. " +
+                repetitionGuard +
                 "Make this case feel like a strong narrative hook for a player. Vary the victim role, location, type of incident, motives, and clue structure. " +
+                "The victim must be male. The suspects must be ordered like this: suspect 1 female, suspect 2 female, suspect 3 male. Choose names, roles, and dialogue that clearly fit those genders. " +
                 "Return valid JSON only with this structure: " +
                 "{\"case_title\":\"string\",\"crime\":\"string\",\"victim\":\"string\",\"location\":\"string\",\"suspects\":[{\"name\":\"string\",\"role\":\"string\",\"connection_to_case\":\"string\",\"motive\":\"string\",\"alibi\":\"string\",\"personality\":\"string\",\"opening_statement\":\"string\",\"questions\":[{\"question\":\"string\",\"answer\":\"string\"},{\"question\":\"string\",\"answer\":\"string\"}]},{\"name\":\"string\",\"role\":\"string\",\"connection_to_case\":\"string\",\"motive\":\"string\",\"alibi\":\"string\",\"personality\":\"string\",\"opening_statement\":\"string\",\"questions\":[{\"question\":\"string\",\"answer\":\"string\"},{\"question\":\"string\",\"answer\":\"string\"}]},{\"name\":\"string\",\"role\":\"string\",\"connection_to_case\":\"string\",\"motive\":\"string\",\"alibi\":\"string\",\"personality\":\"string\",\"opening_statement\":\"string\",\"questions\":[{\"question\":\"string\",\"answer\":\"string\"},{\"question\":\"string\",\"answer\":\"string\"}]}],\"guilty_suspect\":\"string\",\"key_clue\":\"string\",\"explanation\":\"string\"}. " +
                 "Rules: exactly three suspects, exactly two follow-up questions per suspect, no markdown, no code fences, and the guilty suspect must exactly match one suspect name. " +

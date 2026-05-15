@@ -24,6 +24,7 @@ namespace CaseFileLocalSuspect.Game
         private int questionsRemaining;
         private bool isGeneratingCase;
         private int generatedCaseCount;
+        private string previousCaseTitle;
 
         public GameScreen CurrentScreen { get; private set; } = GameScreen.MainMenu;
         public const int StartingQuestionCount = 6;
@@ -83,9 +84,10 @@ namespace CaseFileLocalSuspect.Game
             isGeneratingCase = true;
             generatedCaseCount++;
             int varietySeed = UnityEngine.Random.Range(1000, 999999);
+            uiManager.ShowCaseBriefing(CreateLoadingCase());
             ShowScreen(GameScreen.CaseBriefing);
             ollamaClient.GenerateStructuredJson(
-                PromptBuilder.BuildCaseGenerationPrompt(generatedCaseCount, varietySeed),
+                PromptBuilder.BuildCaseGenerationPrompt(generatedCaseCount, varietySeed, previousCaseTitle),
                 PromptBuilder.BuildCaseGenerationSchema(),
                 HandleCaseGenerationSuccess,
                 HandleCaseGenerationError);
@@ -279,12 +281,13 @@ namespace CaseFileLocalSuspect.Game
 
         private void LoadFallbackCase(string systemMessage)
         {
-            LoadCase(FallbackCaseProvider.CreateCase(), systemMessage);
+            LoadCase(FallbackCaseProvider.CreateCase(generatedCaseCount), systemMessage);
         }
 
         private void LoadCase(CaseFile caseFile, string systemMessage)
         {
             currentCaseFile = caseFile;
+            previousCaseTitle = caseFile != null ? caseFile.caseTitle : previousCaseTitle;
             selectedSuspectIndex = 0;
             selectedAccusationIndex = 0;
             questionsRemaining = StartingQuestionCount;
@@ -316,6 +319,27 @@ namespace CaseFileLocalSuspect.Game
             selectedSuspectIndex = 0;
             selectedAccusationIndex = 0;
             questionsRemaining = StartingQuestionCount;
+        }
+
+        private static CaseFile CreateLoadingCase()
+        {
+            return new CaseFile
+            {
+                caseTitle = "Generating New Case...",
+                crime = "Ollama is building a fresh mystery. If this takes a little longer, the local model is still warming up.",
+                victim = "Pending",
+                victimPortraitId = string.Empty,
+                location = "Pending",
+                suspects = new[]
+                {
+                    new Suspect { name = "Generating...", role = "Suspect profile incoming", connectionToCase = "Waiting for Ollama response.", openingStatement = "Pending." },
+                    new Suspect { name = "Generating...", role = "Suspect profile incoming", connectionToCase = "Waiting for Ollama response.", openingStatement = "Pending." },
+                    new Suspect { name = "Generating...", role = "Suspect profile incoming", connectionToCase = "Waiting for Ollama response.", openingStatement = "Pending." }
+                },
+                guiltySuspect = string.Empty,
+                keyClue = "Pending",
+                explanation = "Pending"
+            };
         }
 
         private void EnsureOllamaClient()
