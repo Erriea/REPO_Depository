@@ -1,39 +1,17 @@
-# LLM Integration Report Draft
+# LLM Integration Report
 
-## Report Purpose
-- This draft will become the 600 to 800 word assignment report covering the technical and design decisions behind the local LLM integration.
+This prototype uses Unity and Ollama to build a small detective game around local language-model generation. The goal was not to add AI as a novelty feature, but to make it responsible for the core content of each play session. Every new round depends on Ollama generating a fictional crime, three suspects, their statements, their follow-up answers, the hidden culprit, and the final explanation. Because the assignment focuses on meaningful local integration, the project was designed so that the LLM output directly shapes gameplay rather than sitting beside it as optional flavor text.
 
-## Technical Decisions
-- The project uses Unity with local HTTP requests to Ollama instead of a hosted model API.
+The earliest idea was more ambitious. The player would type any question they wanted, and each suspect would answer live in character through Ollama. That version sounded exciting, but it quickly created technical risk. Live interrogation required repeated requests, more complicated prompt state, higher latency, and more opportunities for contradictions or malformed responses. For a student prototype under time pressure, that approach was too fragile. The project was therefore simplified into a more reliable structure: Ollama now generates the full case package in one request at the start of the round, and Unity reveals that content through the interrogation interface.
 
-## Integration Strategy
-- Generate one complete hidden case file at the start of a round.
-- Reuse the same stored case file for every suspect response.
+This was the most important technical decision in the project. By reducing the number of live inference calls to one per round, the game became easier to debug, easier to demonstrate, and far more stable for assessment. The player still experiences LLM-driven narrative variety, but the game no longer depends on a chain of successful real-time responses during every interrogation turn. This trade-off kept the LLM central to the experience while protecting the prototype from breaking during a live demonstration.
 
-## How Ollama Is Used
-- Ollama generates structured case data.
-- Ollama roleplays suspects during interrogation.
+The integration strategy is straightforward. When the player presses `New Case`, Unity calls the local Ollama endpoint at `http://localhost:11434/api/generate`. A dedicated client script sends a non-streamed POST request containing the model name, the prompt, and a structured JSON schema. The prompt asks for a case title, a crime hook, a male victim, a location, three suspects, two follow-up questions and answers per suspect, the guilty suspect, a key clue, and an explanation. It also enforces portrait consistency by requiring the suspects to appear in female, female, male order. Once Ollama returns the response, Unity parses it into gameplay data objects and updates the UI.
 
-## Why Local Inference Is Appropriate
-- Local inference matches the assignment requirement and makes the prototype self-contained.
+Using a JSON schema was another important decision. Plain “return JSON” prompting was not reliable enough on its own. At times the model produced invalid structures or omitted required suspect data, which caused the game to fall back to a safe case. Switching to structured output improved consistency and reduced parsing failures. Even so, the project still includes defensive fallback behavior. If Ollama is offline, too slow, or returns unusable data, Unity loads one of several prepared detective cases instead. This ensures that the prototype remains playable and demoable even when local inference misbehaves.
 
-## Gameplay Impact
-- The LLM is central to the questioning and deduction loop.
+Local inference was chosen because it aligns with both the assignment and the design needs of the project. Compared with a hosted model, Ollama provides a self-contained setup, no API billing, and a more transparent demonstration of where inference happens. It also supports the brief’s emphasis on understanding the difference between local and cloud workflows. The downside is that local models can be slower and less consistent than large hosted systems. The first request often takes longer while the model warms up, and smaller local models sometimes produce repetitive or structurally weak results. However, the benefits of reproducibility and local control made the trade-off worthwhile.
 
-## Performance Considerations
-- Smaller local models may be used if latency becomes too high.
+From a gameplay perspective, the LLM improves replayability and authorship efficiency. Instead of writing many hand-authored cases, the developer can generate varied crime setups and suspect relationships from a single system. The player benefits because each round feels less fixed than a static puzzle. At the same time, the design still preserves deduction. The player is not chatting randomly with the AI; they are reading a generated mystery, asking curated questions, and making a judgment based on generated contradictions and clues.
 
-## Fallback Strategy
-- A pre-written fallback case will be used if generation fails, times out, or returns invalid JSON.
-
-## Limitations Of LLM Output
-- Responses may still vary in tone, structure, or quality.
-- Prompt constraints and fallback systems are needed for stability.
-
-## Ethical Considerations
-- The game uses fictional content only.
-- AI usage should be documented clearly.
-- Credits and tooling transparency should be included in the final submission.
-
-## Workflow Evaluation
-- To be expanded after implementation and testing.
+The main limitations are still typical LLM issues: inconsistent quality, occasional structural failure, repeated patterns, and the need for careful prompt constraints. These limitations directly shaped the scope of the final build. Rather than pretending the model could handle anything, the project was redesigned around what it could do reliably. That design choice became the strongest outcome of the prototype. The final game demonstrates a meaningful Ollama integration, remains technically clear, and shows a practical understanding of how to build around local LLM strengths and weaknesses.

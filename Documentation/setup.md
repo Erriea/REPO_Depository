@@ -1,56 +1,123 @@
 # Setup Guide
 
 ## Purpose
-- This document explains how to set up and run the project from scratch as a beginner.
+- This document explains how to install the local model workflow and run the prototype from scratch.
 
 ## Prerequisites
-- Unity Hub installed.
-- The correct Unity Editor version installed.
-- Ollama installed locally.
-- The required local model pulled before testing the game.
+- Unity Hub installed
+- Unity Editor `6000.0.44f1`
+- Ollama installed locally
+- The required model pulled before testing
 
-## Unity Version Used
-- Current project version: `6000.0.44f1`
+## Tested System Specs
+- Operating system: `Microsoft Windows 11 Home Single Language` `10.0.26200`
+- CPU: `13th Gen Intel(R) Core(TM) i7-13620H`
+- CPU cores / logical processors: `10 / 16`
+- RAM: `16 GB` installed memory
+- GPU 1: `NVIDIA GeForce RTX 4050 Laptop GPU`
+- GPU 2: `Intel(R) UHD Graphics`
 
-## Project Setup Overview
-1. Open the project in Unity Hub.
-2. Open the main scene used for the prototype.
-3. Start Ollama before pressing Play.
-4. Generate a case and test the UI flow.
+## Why System Specs Matter
+- Local LLM performance depends on the machine running Ollama.
+- The first request may be slower on lower-spec systems or when the model is loading into memory for the first time.
+- Recording tested hardware helps explain latency differences between machines in the assignment videos and report.
 
-## Ollama Setup
-- Go to the official Ollama website.
-- Download and install Ollama for your operating system.
-- On Windows, open a new PowerShell window after installation.
-- Run `ollama` to confirm the command exists.
-- Pull and test the starter model with `ollama run llama3.2`.
-- Ask for a short test sentence from a suspicious suspect.
-- Exit the terminal chat when finished.
+## Project Path
+- `C:\Code\2026 Unity\REPO_Depository`
 
-## Ollama Server Check
-- Confirm the local server is available at `http://localhost:11434`.
-- Unity will send requests to `http://localhost:11434/api/generate`.
-- PowerShell API test:
+## Unity Setup
+1. Open Unity Hub.
+2. Add or open the project folder.
+3. Open `Assets/Scenes/MainScene.unity`.
+4. Wait for scripts to compile.
+
+## Ollama Installation
+1. Download Ollama from the official Ollama website.
+2. Install it for your operating system.
+3. On Windows, open a new PowerShell window after installation.
+4. Run:
+
+```powershell
+ollama --version
+```
+
+- If a version number appears, Ollama is installed correctly.
+
+## Pull The Tested Model
+```powershell
+ollama pull llama3.2
+```
+
+## Quick Local Test
+```powershell
+ollama run llama3.2
+```
+
+- Ask for a short line such as:
+  - `Write one short detective sentence.`
+- Exit when done.
+
+## Ollama API Check
+- The Unity project sends requests to:
+  - `http://localhost:11434/api/generate`
+
+- PowerShell test:
 
 ```powershell
 (Invoke-WebRequest -Method POST -Body '{"model":"llama3.2","prompt":"Say hello in one short sentence.","stream": false}' -Uri http://localhost:11434/api/generate).Content
 ```
 
-- If the command returns JSON with a `response` field, the local API is working.
+- If the response includes a `response` field, the local API is working.
 
-## Unity Setup
-- Open the project from `C:\Code\2026 Unity\REPO_Depository`.
-- Open the main prototype scene.
-- Press Play in the Unity Editor.
-- If Ollama is not running, the game should use fallback behavior once implemented.
+## How To Run The Prototype
+1. Start Ollama or make sure the Ollama service is available.
+2. Open the Unity project.
+3. Open `MainScene`.
+4. Press Play.
+5. Click `New Case`.
+6. Wait for Ollama to generate the case.
 
-## Troubleshooting To Expand Later
-- `ollama` command not found: close and reopen PowerShell after installation.
-- Model missing: run `ollama run llama3.2`.
-- Server not running: relaunch Ollama from the Start menu.
-- Slow responses: the first request may be loading the model. If needed, try `llama3.2:1b`.
-- Unity cannot parse the response: check that requests use raw JSON and `stream: false`.
+## Reproducible Test Sequence
+1. Run `ollama --version`
+2. Run `ollama pull llama3.2` if the model is missing
+3. Run the API test command in this document
+4. Open the Unity project
+5. Press Play and generate a case
+6. Confirm the game either loads a live generated case or falls back safely
 
-## Git Workflow Notes
-- Commit frequently in small milestones.
-- Suggested milestones will be recorded as the project develops.
+## What The Game Now Does
+- Generates one full detective case per round.
+- Shows three suspects.
+- Gives the player two generated follow-up questions per suspect.
+- Lets the player accuse one suspect.
+- Shows the hidden clue and explanation afterward.
+
+## Troubleshooting
+### `ollama` command not found
+- Close and reopen PowerShell after installation.
+
+### Model missing
+- Run:
+
+```powershell
+ollama pull llama3.2
+```
+
+### Slow first response
+- The model may still be warming up in memory.
+- Wait for the first generation request to complete.
+- This is expected local inference behavior and should be mentioned in the technical demonstration video.
+
+### Unity falls back instead of generating a live case
+- Check that Ollama is running.
+- Confirm the API test above works.
+- Confirm the selected model is installed.
+
+### Output keeps failing
+- Try a smaller supported local model for testing.
+- Confirm that no firewall rule is blocking `localhost:11434`.
+
+## Notes For Demonstration
+- Show Ollama running locally before opening Play mode.
+- Show the terminal API test or the installed model list.
+- Show that the game still works with fallback content if generation fails.
