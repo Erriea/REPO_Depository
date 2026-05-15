@@ -12,7 +12,9 @@ namespace CaseFileLocalSuspect.UI
 
         public void ShowChoices(CaseFile caseFile, PortraitLibrary portraitLibrary, int selectedIndex)
         {
-            SetText(promptText, "Choose the suspect you believe stole the ledger.");
+            SetText(promptText, caseFile != null
+                ? $"Choose who you believe is guilty in \"{caseFile.caseTitle}\"."
+                : "Choose the suspect you believe is guilty.");
 
             if (caseFile == null || caseFile.suspects == null)
             {

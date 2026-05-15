@@ -1,5 +1,6 @@
 using CaseFileLocalSuspect.Game;
 using CaseFileLocalSuspect.UI;
+using CaseFileLocalSuspect.AI;
 using TMPro;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -121,7 +122,13 @@ namespace CaseFileLocalSuspect.Editor
             TMP_Text interrogationRole = CreateText("SelectedSuspectRole", interrogationPanel.transform, "Role", 24, TextAlignmentOptions.Center, new Vector2(0.17f, 0.21f), new Vector2(360f, 40f));
             TMP_Text questionsRemaining = CreateText("QuestionsRemaining", interrogationPanel.transform, "Questions Remaining: 6", 26, TextAlignmentOptions.Center, new Vector2(0.63f, 0.74f), new Vector2(540f, 44f), new Color(0.97f, 0.91f, 0.74f));
 
-            ScrollRect conversationScrollRect = CreateScrollView("ConversationScrollView", interrogationPanel.transform, new Vector2(0.63f, 0.49f), new Vector2(900f, 410f), out RectTransform conversationContentRect, out TMP_Text conversationText);
+            ScrollRect conversationScrollRect = CreateConversationScrollView(
+                "ConversationScrollView",
+                interrogationPanel.transform,
+                new Vector2(0.63f, 0.49f),
+                new Vector2(900f, 410f),
+                out RectTransform conversationContentRect,
+                out TMP_Text conversationText);
             TMP_InputField questionInput = CreateInputField("QuestionInput", interrogationPanel.transform, new Vector2(0.59f, 0.12f), new Vector2(820f, 78f));
             TMP_Text hintText = CreateText("HintText", interrogationPanel.transform, "Ask about alibis, motives, the study, the victim, or the missing ledger.", 20, TextAlignmentOptions.Center, new Vector2(0.60f, 0.19f), new Vector2(860f, 40f), new Color(0.85f, 0.82f, 0.7f));
             Button submitQuestionButton = CreateButton("SubmitQuestionButton", interrogationPanel.transform, "Submit Question", new Vector2(0.88f, 0.12f), new Vector2(250f, 78f));
@@ -153,6 +160,8 @@ namespace CaseFileLocalSuspect.Editor
 
             GameObject gameManagerObject = new GameObject("GameManager");
             GameManager gameManager = gameManagerObject.AddComponent<GameManager>();
+            GameObject ollamaClientObject = new GameObject("OllamaClient");
+            OllamaClient ollamaClient = ollamaClientObject.AddComponent<OllamaClient>();
             GameObject uiManagerObject = new GameObject("UIManager");
             UIManager uiManager = uiManagerObject.AddComponent<UIManager>();
             GameObject portraitLibraryObject = new GameObject("PortraitLibrary");
@@ -171,6 +180,7 @@ namespace CaseFileLocalSuspect.Editor
             SetSerializedReference(uiManager, "accusationPanelUI", accusationUI);
             SetSerializedReference(uiManager, "resultPanelUI", resultUI);
             SetSerializedReference(gameManager, "uiManager", uiManager);
+            SetSerializedReference(gameManager, "ollamaClient", ollamaClient);
 
             SetSerializedReference(briefingUI, "caseTitleText", caseTitle);
             SetSerializedReference(briefingUI, "crimeText", crimeText);
@@ -454,7 +464,62 @@ namespace CaseFileLocalSuspect.Editor
             return inputField;
         }
 
-        private static ScrollRect CreateScrollView(string name, Transform parent, Vector2 anchor, Vector2 size, out RectTransform contentRect, out TMP_Text contentText)
+        private static ScrollRect CreateConversationScrollView(string name, Transform parent, Vector2 anchor, Vector2 size, out RectTransform contentRect, out TMP_Text conversationText)
+        {
+            GameObject root = new GameObject(name, typeof(RectTransform), typeof(Image), typeof(ScrollRect));
+            root.transform.SetParent(parent, false);
+            RectTransform rootRect = root.GetComponent<RectTransform>();
+            rootRect.anchorMin = anchor;
+            rootRect.anchorMax = anchor;
+            rootRect.anchoredPosition = Vector2.zero;
+            rootRect.sizeDelta = size;
+
+            Image rootImage = root.GetComponent<Image>();
+            rootImage.color = new Color(0.12f, 0.11f, 0.1f, 0.95f);
+
+            GameObject viewport = new GameObject("Viewport", typeof(RectTransform), typeof(Image), typeof(Mask));
+            viewport.transform.SetParent(root.transform, false);
+            RectTransform viewportRect = viewport.GetComponent<RectTransform>();
+            viewportRect.anchorMin = Vector2.zero;
+            viewportRect.anchorMax = Vector2.one;
+            viewportRect.offsetMin = new Vector2(16f, 16f);
+            viewportRect.offsetMax = new Vector2(-16f, -16f);
+            viewport.GetComponent<Image>().color = new Color(0f, 0f, 0f, 0f);
+            viewport.GetComponent<Mask>().showMaskGraphic = false;
+
+            GameObject content = new GameObject("Content", typeof(RectTransform));
+            content.transform.SetParent(viewport.transform, false);
+            contentRect = content.GetComponent<RectTransform>();
+            contentRect.anchorMin = new Vector2(0f, 1f);
+            contentRect.anchorMax = new Vector2(1f, 1f);
+            contentRect.pivot = new Vector2(0.5f, 1f);
+            contentRect.anchoredPosition = Vector2.zero;
+            contentRect.sizeDelta = new Vector2(0f, 360f);
+
+            conversationText = CreateText("ConversationText", content.transform, "Conversation", 22, TextAlignmentOptions.TopLeft, new Vector2(0.5f, 1f), new Vector2(size.x - 70f, 360f));
+            RectTransform textRect = conversationText.rectTransform;
+            textRect.anchorMin = new Vector2(0f, 1f);
+            textRect.anchorMax = new Vector2(1f, 1f);
+            textRect.pivot = new Vector2(0.5f, 1f);
+            textRect.anchoredPosition = Vector2.zero;
+            textRect.offsetMin = Vector2.zero;
+            textRect.offsetMax = Vector2.zero;
+            conversationText.enableAutoSizing = false;
+            conversationText.overflowMode = TextOverflowModes.Overflow;
+
+            ScrollRect scrollRect = root.GetComponent<ScrollRect>();
+            scrollRect.viewport = viewportRect;
+            scrollRect.content = contentRect;
+            scrollRect.horizontal = false;
+            scrollRect.vertical = true;
+            scrollRect.movementType = ScrollRect.MovementType.Clamped;
+            scrollRect.scrollSensitivity = 28f;
+            scrollRect.onValueChanged = new ScrollRect.ScrollRectEvent();
+
+            return scrollRect;
+        }
+
+        private static ScrollRect CreateScrollView(string name, Transform parent, Vector2 anchor, Vector2 size, out TMP_Text contentText)
         {
             GameObject root = new GameObject(name, typeof(RectTransform), typeof(Image), typeof(Mask), typeof(ScrollRect));
             root.transform.SetParent(parent, false);
@@ -480,18 +545,19 @@ namespace CaseFileLocalSuspect.Editor
 
             GameObject content = new GameObject("Content", typeof(RectTransform));
             content.transform.SetParent(viewport.transform, false);
-            contentRect = content.GetComponent<RectTransform>();
+            RectTransform contentRect = content.GetComponent<RectTransform>();
             contentRect.anchorMin = new Vector2(0f, 1f);
             contentRect.anchorMax = new Vector2(1f, 1f);
             contentRect.pivot = new Vector2(0.5f, 1f);
             contentRect.anchoredPosition = Vector2.zero;
-            contentRect.sizeDelta = new Vector2(0f, 200f);
+            contentRect.sizeDelta = new Vector2(0f, size.y - 32f);
 
-            contentText = CreateText("ConversationText", content.transform, "Conversation", 22, TextAlignmentOptions.TopLeft, new Vector2(0.5f, 1f), new Vector2(size.x - 70f, 200f));
+            contentText = CreateText("ConversationText", content.transform, "Conversation", 22, TextAlignmentOptions.TopLeft, new Vector2(0.5f, 1f), new Vector2(size.x - 70f, size.y - 40f));
             RectTransform textRect = contentText.GetComponent<RectTransform>();
             textRect.pivot = new Vector2(0.5f, 1f);
             textRect.anchoredPosition = Vector2.zero;
-            contentText.overflowMode = TextOverflowModes.Overflow;
+            contentText.enableAutoSizing = false;
+            contentText.overflowMode = TextOverflowModes.ScrollRect;
 
             ScrollRect scrollRect = root.GetComponent<ScrollRect>();
             scrollRect.viewport = viewportRect;

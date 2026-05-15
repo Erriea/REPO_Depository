@@ -8,9 +8,11 @@ namespace CaseFileLocalSuspect.Game
         public string name;
         public string portraitId;
         public string role;
+        public string connectionToCase;
         public string motive;
         public string alibi;
         public string personality;
-        public string secret;
+        public string openingStatement;
+        public FollowUpQuestion[] followUpQuestions;
     }
 }

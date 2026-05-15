@@ -44,11 +44,11 @@ namespace CaseFileLocalSuspect.UI
             }
         }
 
-        public void ShowInterrogation(CaseFile caseFile, int selectedSuspectIndex, int questionsRemaining, string conversationHistory, bool canAskQuestions)
+        public void ShowInterrogation(CaseFile caseFile, int selectedSuspectIndex, int questionsRemaining, string conversationHistory, string hintMessage, bool canAskQuestions)
         {
             if (interrogationPanelUI != null)
             {
-                interrogationPanelUI.ShowState(caseFile, portraitLibrary, selectedSuspectIndex, questionsRemaining, conversationHistory, canAskQuestions);
+                interrogationPanelUI.ShowState(caseFile, portraitLibrary, selectedSuspectIndex, questionsRemaining, conversationHistory, hintMessage, canAskQuestions);
             }
         }
 

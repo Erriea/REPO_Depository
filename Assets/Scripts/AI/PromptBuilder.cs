@@ -5,39 +5,85 @@ namespace CaseFileLocalSuspect.AI
 {
     public static class PromptBuilder
     {
-        public static string BuildCaseGenerationPrompt()
+        private static readonly string[] CaseThemes =
         {
+            "a disappearance at a theatre",
+            "a sabotage case inside a research lab",
+            "a blackmail case at a charity gala",
+            "a suspicious death inside a coastal hotel",
+            "a missing evidence case at a museum",
+            "a poisoning attempt at a manor dinner",
+            "a financial fraud case in a family business",
+            "a stolen prototype case at a technology expo",
+            "an art theft at a private collection",
+            "a murder in a railway station office"
+        };
+
+        public static string BuildCaseGenerationPrompt(int caseNumber, int varietySeed)
+        {
+            string chosenTheme = CaseThemes[System.Math.Abs(varietySeed) % CaseThemes.Length];
+
             return
-                "Create a fictional detective case for a Unity game. Return valid JSON only with this structure: " +
-                "{\"case_title\":\"string\",\"crime\":\"string\",\"victim\":\"string\",\"location\":\"string\",\"suspects\":[{\"name\":\"string\",\"role\":\"string\",\"motive\":\"string\",\"alibi\":\"string\",\"personality\":\"string\",\"secret\":\"string\"},{\"name\":\"string\",\"role\":\"string\",\"motive\":\"string\",\"alibi\":\"string\",\"personality\":\"string\",\"secret\":\"string\"},{\"name\":\"string\",\"role\":\"string\",\"motive\":\"string\",\"alibi\":\"string\",\"personality\":\"string\",\"secret\":\"string\"}],\"guilty_suspect\":\"string\",\"key_clue\":\"string\",\"explanation\":\"string\"}. " +
-                "Rules: exactly three suspects, no markdown, no code fences, the guilty suspect must exactly match one suspect name, keep the crime non-graphic, and make the case solvable through interrogation.";
+                $"Create a fictional detective case for a Unity game. This is case run {caseNumber} with variation seed {varietySeed}. " +
+                $"Use this case theme: {chosenTheme}. " +
+                "Make this case feel like a strong narrative hook for a player. Vary the victim role, location, type of incident, motives, and clue structure. " +
+                "Return valid JSON only with this structure: " +
+                "{\"case_title\":\"string\",\"crime\":\"string\",\"victim\":\"string\",\"location\":\"string\",\"suspects\":[{\"name\":\"string\",\"role\":\"string\",\"connection_to_case\":\"string\",\"motive\":\"string\",\"alibi\":\"string\",\"personality\":\"string\",\"opening_statement\":\"string\",\"questions\":[{\"question\":\"string\",\"answer\":\"string\"},{\"question\":\"string\",\"answer\":\"string\"}]},{\"name\":\"string\",\"role\":\"string\",\"connection_to_case\":\"string\",\"motive\":\"string\",\"alibi\":\"string\",\"personality\":\"string\",\"opening_statement\":\"string\",\"questions\":[{\"question\":\"string\",\"answer\":\"string\"},{\"question\":\"string\",\"answer\":\"string\"}]},{\"name\":\"string\",\"role\":\"string\",\"connection_to_case\":\"string\",\"motive\":\"string\",\"alibi\":\"string\",\"personality\":\"string\",\"opening_statement\":\"string\",\"questions\":[{\"question\":\"string\",\"answer\":\"string\"},{\"question\":\"string\",\"answer\":\"string\"}]}],\"guilty_suspect\":\"string\",\"key_clue\":\"string\",\"explanation\":\"string\"}. " +
+                "Rules: exactly three suspects, exactly two follow-up questions per suspect, no markdown, no code fences, and the guilty suspect must exactly match one suspect name. " +
+                "Keep the crime non-graphic and solvable from the suspect statements and follow-up answers. " +
+                "Each opening_statement should sound like the suspect is speaking directly to the detective in first person. " +
+                "Each answer should be 1 to 3 sentences, in character, and consistent with the hidden truth of the case. " +
+                "Allowed case types include theft, disappearance, sabotage, blackmail, poisoning, fraud, or murder. " +
+                "Use short, believable names and roles. Keep the explanation concise and specific to the clue.";
         }
 
-        public static string BuildInterrogationPrompt(CaseFile caseFile, Suspect suspect, string playerQuestion)
+        public static string BuildCaseGenerationSchema()
         {
-            StringBuilder prompt = new StringBuilder();
-            prompt.AppendLine("You are roleplaying as a suspect in a fictional detective game.");
-            prompt.AppendLine("Answer in first person.");
-            prompt.AppendLine("Stay consistent with the case file.");
-            prompt.AppendLine("Use only the facts in the case file.");
-            prompt.AppendLine("Do not invent new suspects, evidence, locations, or crimes.");
-            prompt.AppendLine("Do not directly reveal the guilty suspect.");
-            prompt.AppendLine("Do not say 'I am guilty.'");
-            prompt.AppendLine("Keep the answer short: 2 to 5 sentences.");
-            prompt.AppendLine();
-            prompt.AppendLine($"Case title: {caseFile.caseTitle}");
-            prompt.AppendLine($"Crime: {caseFile.crime}");
-            prompt.AppendLine($"Victim: {caseFile.victim}");
-            prompt.AppendLine($"Location: {caseFile.location}");
-            prompt.AppendLine($"Selected suspect: {suspect.name}");
-            prompt.AppendLine($"Role: {suspect.role}");
-            prompt.AppendLine($"Motive: {suspect.motive}");
-            prompt.AppendLine($"Alibi: {suspect.alibi}");
-            prompt.AppendLine($"Personality: {suspect.personality}");
-            prompt.AppendLine($"Secret: {suspect.secret}");
-            prompt.AppendLine();
-            prompt.AppendLine($"Player question: {playerQuestion}");
-            return prompt.ToString();
+            return
+                "{" +
+                "\"type\":\"object\"," +
+                "\"properties\":{" +
+                    "\"case_title\":{\"type\":\"string\"}," +
+                    "\"crime\":{\"type\":\"string\"}," +
+                    "\"victim\":{\"type\":\"string\"}," +
+                    "\"location\":{\"type\":\"string\"}," +
+                    "\"suspects\":{" +
+                        "\"type\":\"array\"," +
+                        "\"minItems\":3," +
+                        "\"maxItems\":3," +
+                        "\"items\":{" +
+                            "\"type\":\"object\"," +
+                            "\"properties\":{" +
+                                "\"name\":{\"type\":\"string\"}," +
+                                "\"role\":{\"type\":\"string\"}," +
+                                "\"connection_to_case\":{\"type\":\"string\"}," +
+                                "\"motive\":{\"type\":\"string\"}," +
+                                "\"alibi\":{\"type\":\"string\"}," +
+                                "\"personality\":{\"type\":\"string\"}," +
+                                "\"opening_statement\":{\"type\":\"string\"}," +
+                                "\"questions\":{" +
+                                    "\"type\":\"array\"," +
+                                    "\"minItems\":2," +
+                                    "\"maxItems\":2," +
+                                    "\"items\":{" +
+                                        "\"type\":\"object\"," +
+                                        "\"properties\":{" +
+                                            "\"question\":{\"type\":\"string\"}," +
+                                            "\"answer\":{\"type\":\"string\"}" +
+                                        "}," +
+                                        "\"required\":[\"question\",\"answer\"]" +
+                                    "}" +
+                                "}" +
+                            "}," +
+                            "\"required\":[\"name\",\"role\",\"connection_to_case\",\"motive\",\"alibi\",\"personality\",\"opening_statement\",\"questions\"]" +
+                        "}" +
+                    "}," +
+                    "\"guilty_suspect\":{\"type\":\"string\"}," +
+                    "\"key_clue\":{\"type\":\"string\"}," +
+                    "\"explanation\":{\"type\":\"string\"}" +
+                "}," +
+                "\"required\":[\"case_title\",\"crime\",\"victim\",\"location\",\"suspects\",\"guilty_suspect\",\"key_clue\",\"explanation\"]" +
+                "}";
         }
     }
 }

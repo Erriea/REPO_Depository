@@ -20,16 +20,16 @@ namespace CaseFileLocalSuspect.UI
                 SetPortrait(null);
                 SetText(suspectNameText, "Unknown Suspect");
                 SetText(suspectRoleText, "Role: Unknown");
-                SetText(suspectMotiveText, "Motive: Unknown");
-                SetText(suspectAlibiText, "Alibi: Unknown");
+                SetText(suspectMotiveText, "Connection: Unknown");
+                SetText(suspectAlibiText, "Story: Unknown");
                 return;
             }
 
             SetPortrait(portraitSprite);
             SetText(suspectNameText, suspect.name);
             SetText(suspectRoleText, $"Role: {suspect.role}");
-            SetText(suspectMotiveText, $"Motive: {Shorten(suspect.motive, 90)}");
-            SetText(suspectAlibiText, $"Alibi: {Shorten(suspect.alibi, 95)}");
+            SetText(suspectMotiveText, $"Connection: {Shorten(suspect.connectionToCase, 100)}");
+            SetText(suspectAlibiText, $"Story: {Shorten(suspect.openingStatement, 125)}");
         }
 
         private static void SetText(TMP_Text textField, string value)

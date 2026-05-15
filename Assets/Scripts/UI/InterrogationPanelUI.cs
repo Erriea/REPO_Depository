@@ -7,6 +7,9 @@ namespace CaseFileLocalSuspect.UI
 {
     public class InterrogationPanelUI : MonoBehaviour
     {
+        private const float MinimumConversationHeight = 360f;
+        private const float ConversationBottomPadding = 24f;
+
         [SerializeField] private GameManager gameManager;
         [SerializeField] private TMP_Text selectedSuspectNameText;
         [SerializeField] private TMP_Text selectedSuspectRoleText;
@@ -21,7 +24,12 @@ namespace CaseFileLocalSuspect.UI
         [SerializeField] private Button accuseButton;
         [SerializeField] private SuspectChoiceButtonUI[] suspectButtons;
 
-        public void ShowState(CaseFile caseFile, PortraitLibrary portraitLibrary, int selectedSuspectIndex, int questionsRemaining, string conversationHistory, bool canAskQuestions)
+        private void Awake()
+        {
+            ConfigureConversationLayout();
+        }
+
+        public void ShowState(CaseFile caseFile, PortraitLibrary portraitLibrary, int selectedSuspectIndex, int questionsRemaining, string conversationHistory, string hintMessage, bool canAskQuestions)
         {
             if (caseFile == null || caseFile.suspects == null || caseFile.suspects.Length == 0)
             {
@@ -30,14 +38,12 @@ namespace CaseFileLocalSuspect.UI
 
             Suspect selectedSuspect = caseFile.suspects[selectedSuspectIndex];
             SetText(selectedSuspectNameText, selectedSuspect.name);
-            SetText(selectedSuspectRoleText, selectedSuspect.role);
+            SetText(selectedSuspectRoleText, $"Role: {selectedSuspect.role}\nConnection: {selectedSuspect.connectionToCase}");
             SetText(questionsRemainingText, $"Questions Remaining: {questionsRemaining}");
             SetText(conversationHistoryText, string.IsNullOrWhiteSpace(conversationHistory)
                 ? "Select a suspect and start asking questions."
                 : conversationHistory);
-            SetText(hintText, canAskQuestions
-                ? "Ask about alibis, motives, the study, the victim, or the missing ledger."
-                : "No questions remain. Make your accusation.");
+            SetText(hintText, hintMessage);
 
             if (selectedSuspectPortraitImage != null)
             {
@@ -55,8 +61,7 @@ namespace CaseFileLocalSuspect.UI
                 accuseButton.interactable = true;
             }
 
-            ScrollConversationToBottom();
-
+            RefreshConversationView();
             for (int i = 0; i < suspectButtons.Length; i++)
             {
                 Suspect suspect = i < caseFile.suspects.Length ? caseFile.suspects[i] : null;
@@ -79,25 +84,20 @@ namespace CaseFileLocalSuspect.UI
             SetText(hintText, message);
         }
 
-        private void ScrollConversationToBottom()
+        private void RefreshConversationView()
         {
-            if (conversationHistoryText != null)
+            if (conversationHistoryText == null)
             {
-                conversationHistoryText.ForceMeshUpdate();
-
-                RectTransform textRect = conversationHistoryText.rectTransform;
-                float preferredHeight = Mathf.Max(conversationHistoryText.preferredHeight + 20f, 200f);
-                textRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, preferredHeight);
-
-                if (conversationContentRect != null)
-                {
-                    conversationContentRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, preferredHeight);
-                }
+                return;
             }
+
+            ConfigureConversationLayout();
+            conversationHistoryText.ForceMeshUpdate();
 
             if (conversationContentRect != null)
             {
-                LayoutRebuilder.ForceRebuildLayoutImmediate(conversationContentRect);
+                float preferredHeight = Mathf.Max(conversationHistoryText.preferredHeight + ConversationBottomPadding, MinimumConversationHeight);
+                conversationContentRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, preferredHeight);
             }
 
             Canvas.ForceUpdateCanvases();
@@ -105,6 +105,35 @@ namespace CaseFileLocalSuspect.UI
             if (conversationScrollRect != null)
             {
                 conversationScrollRect.verticalNormalizedPosition = 0f;
+            }
+        }
+
+        private void ConfigureConversationLayout()
+        {
+            if (conversationHistoryText == null)
+            {
+                return;
+            }
+
+            RectTransform textRect = conversationHistoryText.rectTransform;
+            textRect.anchorMin = new Vector2(0f, 1f);
+            textRect.anchorMax = new Vector2(1f, 1f);
+            textRect.pivot = new Vector2(0.5f, 1f);
+            textRect.anchoredPosition = Vector2.zero;
+            textRect.offsetMin = new Vector2(0f, 0f);
+            textRect.offsetMax = new Vector2(0f, 0f);
+
+            conversationHistoryText.enableAutoSizing = false;
+            conversationHistoryText.enableWordWrapping = true;
+            conversationHistoryText.overflowMode = TextOverflowModes.Overflow;
+
+            if (conversationContentRect != null)
+            {
+                conversationContentRect.anchorMin = new Vector2(0f, 1f);
+                conversationContentRect.anchorMax = new Vector2(1f, 1f);
+                conversationContentRect.pivot = new Vector2(0.5f, 1f);
+                conversationContentRect.anchoredPosition = Vector2.zero;
+                conversationContentRect.sizeDelta = new Vector2(0f, Mathf.Max(conversationContentRect.sizeDelta.y, MinimumConversationHeight));
             }
         }
 
