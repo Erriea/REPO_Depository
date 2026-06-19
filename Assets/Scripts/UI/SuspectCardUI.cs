@@ -9,9 +9,10 @@ namespace CaseFileLocalSuspect.UI
     {
         [SerializeField] private Image portraitImage;
         [SerializeField] private TMP_Text suspectNameText;
-        [SerializeField] private TMP_Text suspectRoleText;
-        [SerializeField] private TMP_Text suspectMotiveText;
-        [SerializeField] private TMP_Text suspectAlibiText;
+        [SerializeField] private TMP_Text descriptionText;
+        [SerializeField] private TMP_Text appearanceText;
+        [SerializeField] private TMP_Text caseText;
+        [SerializeField] private TMP_Text motiveText;
 
         public void SetSuspect(Suspect suspect, Sprite portraitSprite)
         {
@@ -19,17 +20,30 @@ namespace CaseFileLocalSuspect.UI
             {
                 SetPortrait(null);
                 SetText(suspectNameText, "Unknown Suspect");
-                SetText(suspectRoleText, "Role: Unknown");
-                SetText(suspectMotiveText, "Connection: Unknown");
-                SetText(suspectAlibiText, "Story: Unknown");
+                SetText(descriptionText, "Description: Unknown");
+                SetText(appearanceText, "Appearance: Unknown");
+                SetText(caseText, "Relationship: Unknown");
+                SetText(motiveText, "Alibi: Unknown");
                 return;
             }
 
             SetPortrait(portraitSprite);
             SetText(suspectNameText, suspect.name);
-            SetText(suspectRoleText, $"Role: {suspect.role}");
-            SetText(suspectMotiveText, $"Connection: {Shorten(suspect.connectionToCase, 100)}");
-            SetText(suspectAlibiText, $"Story: {Shorten(suspect.openingStatement, 125)}");
+            SetText(
+                descriptionText,
+                $"Description: {suspect.description}");
+            SetText(
+                appearanceText,
+                $"Appearance: {suspect.appearance}\n\n" +
+                $"Personality: {suspect.personality}");
+            SetText(
+                caseText,
+                $"Relationship: {suspect.connectionToCase}\n\n" +
+                $"Last saw victim: {suspect.lastSeenVictim}");
+            SetText(
+                motiveText,
+                $"Alibi: {suspect.alibi}\n\n" +
+                $"Motive: {suspect.motive}");
         }
 
         private static void SetText(TMP_Text textField, string value)
@@ -47,16 +61,6 @@ namespace CaseFileLocalSuspect.UI
                 portraitImage.sprite = portraitSprite;
                 portraitImage.enabled = portraitSprite != null;
             }
-        }
-
-        private static string Shorten(string text, int maxLength)
-        {
-            if (string.IsNullOrWhiteSpace(text) || text.Length <= maxLength)
-            {
-                return text;
-            }
-
-            return text.Substring(0, maxLength - 3).TrimEnd() + "...";
         }
     }
 }

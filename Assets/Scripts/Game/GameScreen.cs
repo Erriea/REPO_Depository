@@ -3,9 +3,11 @@ namespace CaseFileLocalSuspect.Game
     public enum GameScreen
     {
         MainMenu,
-        CaseBriefing,
+        CrimeBoard,
+        Crime,
+        Suspects,
         Interrogation,
-        Accusation,
+        Arrest,
         Result
     }
 }

@@ -1,4 +1,5 @@
 using CaseFileLocalSuspect.Game;
+using TMPro;
 using UnityEngine;
 
 namespace CaseFileLocalSuspect.UI
@@ -7,56 +8,65 @@ namespace CaseFileLocalSuspect.UI
     {
         [Header("Panels")]
         [SerializeField] private GameObject mainMenuPanel;
-        [SerializeField] private GameObject caseBriefingPanel;
+        [SerializeField] private GameObject crimeBoardPanel;
+        [SerializeField] private GameObject crimePanel;
+        [SerializeField] private GameObject suspectsPanel;
         [SerializeField] private GameObject interrogationPanel;
-        [SerializeField] private GameObject accusationPanel;
+        [SerializeField] private GameObject arrestPanel;
         [SerializeField] private GameObject resultPanel;
+        [SerializeField] private TMP_Text timerText;
 
         [Header("Panel Controllers")]
         [SerializeField] private PortraitLibrary portraitLibrary;
-        [SerializeField] private CaseBriefingPanelUI caseBriefingPanelUI;
+        [SerializeField] private CrimeBoardPanelUI crimeBoardPanelUI;
+        [SerializeField] private CrimeDetailsPanelUI crimeDetailsPanelUI;
+        [SerializeField] private SuspectsPanelUI suspectsPanelUI;
         [SerializeField] private InterrogationPanelUI interrogationPanelUI;
         [SerializeField] private AccusationPanelUI accusationPanelUI;
         [SerializeField] private ResultPanelUI resultPanelUI;
+        [SerializeField] private Color timerNormalColor = new Color(0.97f, 0.91f, 0.74f, 1f);
+        [SerializeField] private Color timerUrgentColor = new Color(0.93f, 0.39f, 0.31f, 1f);
 
         public void ShowScreen(GameScreen screen)
         {
             SetPanelActive(mainMenuPanel, screen == GameScreen.MainMenu);
-            SetPanelActive(caseBriefingPanel, screen == GameScreen.CaseBriefing);
+            SetPanelActive(crimeBoardPanel, screen == GameScreen.CrimeBoard);
+            SetPanelActive(crimePanel, screen == GameScreen.Crime);
+            SetPanelActive(suspectsPanel, screen == GameScreen.Suspects);
             SetPanelActive(interrogationPanel, screen == GameScreen.Interrogation);
-            SetPanelActive(accusationPanel, screen == GameScreen.Accusation);
+            SetPanelActive(arrestPanel, screen == GameScreen.Arrest);
             SetPanelActive(resultPanel, screen == GameScreen.Result);
         }
 
-        public void ShowCaseBriefing(CaseFile caseFile)
+        public void ShowCrimeBoard(CaseFile caseFile, bool viewedCrime, bool viewedSuspects, bool completedInterrogation, bool arrestUnlocked, int questionsRemaining, string systemMessage)
         {
-            if (caseBriefingPanelUI != null)
+            if (crimeBoardPanelUI != null)
             {
-                caseBriefingPanelUI.ShowCase(caseFile, portraitLibrary);
+                crimeBoardPanelUI.ShowState(caseFile, viewedCrime, viewedSuspects, completedInterrogation, arrestUnlocked, questionsRemaining, systemMessage);
             }
         }
 
-        private static void SetPanelActive(GameObject panel, bool isActive)
+        public void ShowCrimeDetails(CaseFile caseFile)
         {
-            if (panel != null)
+            if (crimeDetailsPanelUI != null)
             {
-                panel.SetActive(isActive);
+                crimeDetailsPanelUI.ShowCase(caseFile, portraitLibrary);
             }
         }
 
-        public void ShowInterrogation(CaseFile caseFile, int selectedSuspectIndex, int questionsRemaining, string conversationHistory, string hintMessage, bool canAskQuestions)
+        public void ShowSuspects(CaseFile caseFile)
+        {
+            if (suspectsPanelUI != null)
+            {
+                suspectsPanelUI.ShowSuspects(caseFile, portraitLibrary);
+            }
+        }
+
+        public void ShowInterrogation(CaseFile caseFile, int selectedSuspectIndex, int questionsRemaining, string conversationHistory, bool completedInterrogationStep, bool[] askedQuestionFlags)
         {
             if (interrogationPanelUI != null)
             {
-                interrogationPanelUI.ShowState(caseFile, portraitLibrary, selectedSuspectIndex, questionsRemaining, conversationHistory, hintMessage, canAskQuestions);
-            }
-        }
-
-        public void ClearQuestionInput()
-        {
-            if (interrogationPanelUI != null)
-            {
-                interrogationPanelUI.ClearQuestionInput();
+                interrogationPanelUI.ShowState(caseFile, portraitLibrary, selectedSuspectIndex, questionsRemaining, conversationHistory, completedInterrogationStep, askedQuestionFlags);
             }
         }
 
@@ -68,11 +78,11 @@ namespace CaseFileLocalSuspect.UI
             }
         }
 
-        public void ShowAccusation(CaseFile caseFile, int selectedAccusationIndex)
+        public void ShowAccusation(CaseFile caseFile, int selectedAccusationIndex, bool forcedByTimeout)
         {
             if (accusationPanelUI != null)
             {
-                accusationPanelUI.ShowChoices(caseFile, portraitLibrary, selectedAccusationIndex);
+                accusationPanelUI.ShowChoices(caseFile, portraitLibrary, selectedAccusationIndex, forcedByTimeout);
             }
         }
 
@@ -81,6 +91,26 @@ namespace CaseFileLocalSuspect.UI
             if (resultPanelUI != null)
             {
                 resultPanelUI.ShowResult(caseFile, portraitLibrary, accusedIndex, isCorrect);
+            }
+        }
+
+        public void ShowTimer(bool isVisible, string message, bool isUrgent)
+        {
+            if (timerText == null)
+            {
+                return;
+            }
+
+            timerText.gameObject.SetActive(isVisible);
+            timerText.text = message;
+            timerText.color = isUrgent ? timerUrgentColor : timerNormalColor;
+        }
+
+        private static void SetPanelActive(GameObject panel, bool isActive)
+        {
+            if (panel != null)
+            {
+                panel.SetActive(isActive);
             }
         }
     }

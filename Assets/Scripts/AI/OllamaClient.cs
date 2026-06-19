@@ -16,7 +16,8 @@ namespace CaseFileLocalSuspect.AI
 
         [SerializeField] private string endpointUrl = "http://localhost:11434/api/generate";
         [SerializeField] private string defaultModel = "llama3.2";
-        [SerializeField] private int requestTimeoutSeconds = 60;
+        [SerializeField] private int requestTimeoutSeconds = 180;
+        [SerializeField] private int timeoutRetryCount = 1;
 
         public void GenerateText(string prompt, Action<string> onSuccess, Action<string> onError)
         {
@@ -35,10 +36,10 @@ namespace CaseFileLocalSuspect.AI
 
         private void GenerateText(string prompt, bool expectsJson, string jsonSchema, Action<string> onSuccess, Action<string> onError)
         {
-            StartCoroutine(GenerateTextRoutine(prompt, expectsJson, jsonSchema, onSuccess, onError));
+            StartCoroutine(GenerateTextRoutine(prompt, expectsJson, jsonSchema, onSuccess, onError, timeoutRetryCount + 1));
         }
 
-        private IEnumerator GenerateTextRoutine(string prompt, bool expectsJson, string jsonSchema, Action<string> onSuccess, Action<string> onError)
+        private IEnumerator GenerateTextRoutine(string prompt, bool expectsJson, string jsonSchema, Action<string> onSuccess, Action<string> onError, int attemptsRemaining)
         {
             string requestJson = BuildRequestJson(prompt, expectsJson, jsonSchema);
             byte[] payload = System.Text.Encoding.UTF8.GetBytes(requestJson);
@@ -54,7 +55,18 @@ namespace CaseFileLocalSuspect.AI
 
                 if (request.result != UnityWebRequest.Result.Success)
                 {
-                    onError?.Invoke($"Ollama request failed: {request.error}");
+                    bool timedOut = request.result == UnityWebRequest.Result.ConnectionError
+                        && !string.IsNullOrWhiteSpace(request.error)
+                        && request.error.IndexOf("timed out", StringComparison.OrdinalIgnoreCase) >= 0;
+
+                    if (timedOut && attemptsRemaining > 1)
+                    {
+                        Debug.LogWarning($"Ollama timed out after {requestTimeoutSeconds} seconds. Retrying once more because the model may still be warming up.");
+                        yield return GenerateTextRoutine(prompt, expectsJson, jsonSchema, onSuccess, onError, attemptsRemaining - 1);
+                        yield break;
+                    }
+
+                    onError?.Invoke(BuildFailureMessage(request.error, timedOut));
                     yield break;
                 }
 
@@ -77,6 +89,18 @@ namespace CaseFileLocalSuspect.AI
             }
         }
 
+        private string BuildFailureMessage(string requestError, bool timedOut)
+        {
+            if (timedOut)
+            {
+                return
+                    $"Ollama request timed out after {requestTimeoutSeconds} seconds at {endpointUrl} using model {defaultModel}. " +
+                    "The local endpoint is probably reachable, but the model is still warming up. Try again after Ollama has loaded the model into memory.";
+            }
+
+            return $"Ollama request failed at {endpointUrl} using model {defaultModel}: {requestError}";
+        }
+
         private string BuildRequestJson(string prompt, bool expectsJson, string jsonSchema)
         {
             string formatJson = "\"format\":\"json\"";
@@ -96,6 +120,7 @@ namespace CaseFileLocalSuspect.AI
                 $"\"prompt\":\"{EscapeJson(prompt)}\"," +
                 "\"stream\":false," +
                 $"{formatJson}," +
+                "\"keep_alive\":\"10m\"," +
                 "\"options\":{\"temperature\":0}" +
                 "}";
         }

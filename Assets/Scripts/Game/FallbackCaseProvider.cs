@@ -11,7 +11,7 @@ namespace CaseFileLocalSuspect.Game
                 case 1:
                     return CreateMuseumSabotage();
                 default:
-                    return CreateTheatreDisappearance();
+                    return CreateTheatreMurder();
             }
         }
 
@@ -20,13 +20,25 @@ namespace CaseFileLocalSuspect.Game
             return new CaseFile
             {
                 caseTitle = "The Marlowe Ledger Theft",
-                crime = "Late last night, the sealed financial ledger for the Marlowe Foundation vanished from the victim's office just before a public fraud hearing.",
+                boardSummary = "The financial ledger that could expose fraud inside the Marlowe Foundation vanished just before a public hearing. Three insiders had motive, access, and something to hide.",
+                victimDescription = "Victor Harrow, the foundation's severe and deeply controlling director, had spent years making enemies with his need to dominate every room he entered. He had no patience for weakness, little affection for the people who worked under him, and more than enough secrets in his financial records to give someone a reason to silence him.",
+                crime = "Late last night, Victor Harrow withdrew to his private study with the sealed Marlowe Foundation ledger, intending to face a public fraud hearing in the morning. Before he could speak, the ledger vanished and the people closest to the foundation began scrambling to protect themselves.",
                 victim = "Victor Harrow",
                 victimPortraitId = "MascCharacter1",
                 location = "Harrow Estate, private study",
-                guiltySuspect = "Nadia Price",
-                keyClue = "Nadia insists the study door was already open, but only the victim and the culprit knew the door had been relocked after dinner.",
-                explanation = "Nadia Price stole the ledger to stop Victor from revealing that she had been quietly rerouting foundation money. Her answers sound polished at first, but her story slips when she describes the study as already open. That detail conflicts with the butler's account and with the victim's habit of locking the study whenever he stepped away. The contradiction makes her the only suspect with both motive and hidden access.",
+                onSiteClues = new[]
+                {
+                    "The study door had been relocked after dinner, which means whoever entered later either had access or was let in.",
+                    "A smudged accounting glove print was found near the desk drawer that held the missing ledger.",
+                    "Someone tampered with the hearing notes to remove references to missing foundation money."
+                },
+                interrogationQuestions = new[]
+                {
+                    "Where were you when Victor should have been preparing for the hearing?",
+                    "Why were you personally concerned about the missing ledger?",
+                    "What did you notice about the study or corridor that night?",
+                    "Who do you think had the best chance to get close to Victor before the ledger vanished?"
+                },
                 suspects = new[]
                 {
                     new Suspect
@@ -34,23 +46,20 @@ namespace CaseFileLocalSuspect.Game
                         name = "Elena Voss",
                         portraitId = "FemCharacter1",
                         role = "Public relations advisor",
-                        connectionToCase = "She managed the foundation's media strategy and was in the house preparing for the hearing.",
-                        motive = "Victor planned to dismiss her after the hearing, which would ruin her reputation.",
-                        alibi = "I was in the ballroom making a last phone call to the press office when the shouting started.",
+                        description = "Elena Voss presents herself like a woman who has survived too many scandals by never letting anyone see her panic. As the foundation's public relations advisor, she spent years polishing Victor's image while quietly resenting the way he treated everyone around him.",
+                        appearance = "She is elegant, impeccably dressed, and carries herself with the practiced calm of someone used to hiding fear behind charm.",
+                        connectionToCase = "She managed the foundation's public image and spent the evening trying to control how the coming scandal would look to the press.",
+                        lastSeenVictim = "She claims she last saw Victor before dinner, when he brushed past her with the ledger under one arm and snapped that the press would hear only what he chose to reveal.",
+                        motive = "Victor planned to dismiss her after the hearing, a humiliation that would have ended her carefully built reputation overnight.",
+                        alibi = "She says she was in the ballroom making a tense last-minute call to the press office when the shouting began.",
                         personality = "Elegant, guarded, and quick to deflect",
-                        openingStatement = "Victor liked to keep everyone tense before an announcement. I was preparing the press office notes when the house suddenly erupted, and by then everyone was already accusing everyone else.",
-                        followUpQuestions = new[]
+                        openingStatement = "Victor liked keeping people on edge before a major announcement. I was dealing with the press when everything fell apart.",
+                        interrogationAnswers = new[]
                         {
-                            new FollowUpQuestion
-                            {
-                                question = "What was your relationship with Victor before the hearing?",
-                                answer = "Professional, mostly. He could be ruthless, and yes, he planned to push me out, but that does not mean I walked into his study and stole anything."
-                            },
-                            new FollowUpQuestion
-                            {
-                                question = "Did you see anyone near the study before the ledger disappeared?",
-                                answer = "Not clearly. I remember movement in the corridor, but I was focused on my call and I only caught the tail end of someone heading away from that part of the house."
-                            }
+                            "I was finalizing press wording in the ballroom. I had no reason to be alone near the study.",
+                            "Because the hearing would decide all our futures, including mine. Without the ledger, the whole foundation would look compromised.",
+                            "I noticed movement in the corridor, but not enough to identify anyone. The study wing was tense long before the shouting began.",
+                            "Nadia had the strongest reason to worry. She lived inside those records."
                         }
                     },
                     new Suspect
@@ -58,23 +67,20 @@ namespace CaseFileLocalSuspect.Game
                         name = "Nadia Price",
                         portraitId = "FemCharacter2",
                         role = "Foundation accountant",
-                        connectionToCase = "She controlled the financial records and was meant to brief Victor before the public hearing.",
-                        motive = "The missing ledger could expose that she altered grant records to hide stolen funds.",
-                        alibi = "I only went looking for Victor after dinner because he missed the budget review. The study door was already open when I got there.",
+                        description = "Nadia Price is the sort of accountant who seems to disappear into the background until the numbers begin to turn dangerous. She had Victor's trust when it came to ledgers and budgets, but she also knew exactly how much ruin a single missing record could cause.",
+                        appearance = "She is neat, composed, and severe, with the kind of precise posture that suggests she hates disorder in any form.",
+                        connectionToCase = "She controlled the financial records and had been expected to walk Victor through the numbers one last time before sunrise.",
+                        lastSeenVictim = "She says she last expected to see Victor in the study for their late-night review, but claims she reached the corridor only after he had already gone silent.",
+                        motive = "The ledger could expose that she altered grant records and quietly hid stolen foundation funds behind tidy paperwork.",
+                        alibi = "She says she went to find Victor after dinner when he missed their review and discovered the study already open.",
                         personality = "Controlled, precise, and slightly defensive",
-                        openingStatement = "I was trying to prevent a public disaster, not cause one. Victor missed our budget review, so I went to find him, and the study looked disturbed before I touched anything.",
-                        followUpQuestions = new[]
+                        openingStatement = "I was trying to prevent a public disaster, not cause one. Victor missed our review, so I went to find him.",
+                        interrogationAnswers = new[]
                         {
-                            new FollowUpQuestion
-                            {
-                                question = "Why were you so concerned about the ledger that night?",
-                                answer = "Because the hearing depended on it. Without the ledger, Victor would be cornered by questions he could not answer, and the entire foundation would look compromised."
-                            },
-                            new FollowUpQuestion
-                            {
-                                question = "How did you know the study door was open?",
-                                answer = "Because I saw it with my own eyes when I arrived. I reached the corridor, noticed the door ajar, and stepped in to see whether Victor had left in a hurry."
-                            }
+                            "I left the accounting office after Victor failed to arrive for our review. That is when I went to the study wing.",
+                            "Because the ledger anchored the hearing. Without it, Victor would be exposed and so would everyone connected to those numbers.",
+                            "The study door was already open when I reached it, and the room looked disturbed. I stepped in to see if Victor had left in a hurry.",
+                            "Marcus knew the lock schedule better than anyone, but Elena had plenty to lose from the hearing too."
                         }
                     },
                     new Suspect
@@ -82,26 +88,30 @@ namespace CaseFileLocalSuspect.Game
                         name = "Marcus Flint",
                         portraitId = "MascCharacter2",
                         role = "Head of estate security",
-                        connectionToCase = "He was responsible for the estate corridors, locks, and movement logs that night.",
-                        motive = "Victor had threatened to fire him after a string of recent security failures.",
-                        alibi = "I was outside checking the service gate after the storm knocked the lights for a minute.",
+                        description = "Marcus Flint looks like a man worn down by long nights, bad news, and employers who only notice security when it fails. He knew every lock, hallway, and blind angle in the estate, which makes his presence both useful and troubling.",
+                        appearance = "He is broad-shouldered, tired-eyed, and carries himself like someone used to standing between rich people and their consequences.",
+                        connectionToCase = "He oversaw the estate corridors, the study locks, and the guard movement at the exact hour the ledger disappeared.",
+                        lastSeenVictim = "He says he last saw Victor heading into the study after dinner, locking the door behind him in the old habit he never broke.",
+                        motive = "Victor had threatened to fire him after a string of recent security embarrassments at the estate.",
+                        alibi = "He says he was outside checking the service gate after a brief power dip interrupted the house routine.",
                         personality = "Blunt, tired, but direct",
-                        openingStatement = "I know how this looks. Security failures land on me first, but I was dealing with the service gate when the lights dipped and that is exactly why I was away from the study.",
-                        followUpQuestions = new[]
+                        openingStatement = "Everyone points at security first, but I was dealing with the service gate when the lights flickered. That is exactly why I was away from the study.",
+                        interrogationAnswers = new[]
                         {
-                            new FollowUpQuestion
-                            {
-                                question = "Did the power issue create an opportunity for the thief?",
-                                answer = "It created confusion, yes, but not a total blackout. Anyone who already knew the house and the timing could use that minute of distraction."
-                            },
-                            new FollowUpQuestion
-                            {
-                                question = "Did you notice anything unusual in the corridor afterward?",
-                                answer = "I saw Nadia near that wing after the disturbance settled. I cannot swear I saw the ledger in her hands, but she was the one person leaving that corridor in a hurry."
-                            }
+                            "I was at the service gate during the power dip. When I came back in, the study corridor was already in chaos.",
+                            "I was concerned because a missing ledger meant another failure pinned on my department, not because I wanted it gone.",
+                            "The door had definitely been relocked after dinner. I know that because I checked the study wing myself earlier.",
+                            "Nadia had the clearest access problem, and she was the one I saw leaving that corridor in a hurry."
                         }
                     }
-                }
+                },
+                guiltySuspect = "Nadia Price",
+                guiltClues = new[]
+                {
+                    "Nadia says the study door was already open, but Marcus confirms it had been relocked after dinner.",
+                    "The missing money trail gave Nadia the strongest personal reason to remove the ledger."
+                },
+                explanation = "Nadia Price stole the ledger to stop Victor from exposing the missing foundation money. Her slip about the study door being open reveals knowledge that only the culprit could have had after the room was relocked."
             };
         }
 
@@ -110,37 +120,46 @@ namespace CaseFileLocalSuspect.Game
             return new CaseFile
             {
                 caseTitle = "The Silent Gallery Sabotage",
-                crime = "Just before a high-profile unveiling, the climate control system in the Ashbourne Museum failed and nearly destroyed a priceless restoration project.",
+                boardSummary = "A museum climate-control failure nearly ruined a major unveiling. The sabotage points toward someone who knew the restoration wing and cared too much about the transfer.",
+                victimDescription = "Dr. Owen Vale was brilliant, vain, and far too willing to gamble with fragile things if applause waited on the other side. He had protégés who admired him, colleagues who despised him, and enough professional arrogance to make a desperate act feel almost inevitable.",
+                crime = "Just before a high-profile unveiling, the climate control in the Ashbourne Museum restoration wing failed and sent the room into a dangerous swing of heat and moisture. Within minutes, Dr. Owen Vale's prized restoration project was on the brink of ruin and the evening dissolved into panic.",
                 victim = "Dr. Owen Vale",
                 victimPortraitId = "MascCharacter1",
                 location = "Ashbourne Museum, restoration wing",
-                guiltySuspect = "Mira Sloane",
-                keyClue = "Mira claims she never entered the control room, but only someone inside could know the emergency override panel had been jammed with a brass palette knife.",
-                explanation = "Mira Sloane sabotaged the restoration wing to ruin Dr. Vale's unveiling and force the museum to cancel the transfer of the painting she believed should remain under her care. Her answer reveals knowledge of the jammed override panel before investigators publicly mention it.",
+                onSiteClues = new[]
+                {
+                    "The emergency override panel was jammed with a brass palette knife from the conservator's tool set.",
+                    "Only staff with restoration access could enter the control room without forcing the lock.",
+                    "The sabotage happened minutes before the painting's transfer announcement."
+                },
+                interrogationQuestions = new[]
+                {
+                    "Where were you when the restoration alarms began?",
+                    "Why did tonight's unveiling matter so much to you?",
+                    "What do you know about the control room failure itself?",
+                    "Who seemed most affected by Dr. Vale's decision to move forward with the transfer?"
+                },
                 suspects = new[]
                 {
                     new Suspect
                     {
-                        name = "Jonah Reed",
-                        portraitId = "MascCharacter2",
-                        role = "Night technician",
-                        connectionToCase = "He monitored the museum systems and responded first when the alarms triggered.",
-                        motive = "Dr. Vale had filed complaints about Jonah's missed maintenance logs.",
-                        alibi = "I was on the east staircase tracing a lighting fault when the temperature alarms started screaming through the wing.",
-                        personality = "Nervous, practical, and eager to be believed",
-                        openingStatement = "I know the systems, sure, but that also means I knew how bad this failure was the second it started. I ran toward the alarms, not away from them.",
-                        followUpQuestions = new[]
+                        name = "Clara Benn",
+                        portraitId = "FemCharacter1",
+                        role = "Museum donor liaison",
+                        description = "Clara Benn moves through a room like she was trained to smooth trouble out of the air before anyone important notices it. She is deeply invested in appearances, and an unveiling disaster would stain her reputation as much as the museum's.",
+                        appearance = "She is polished, fashionably dressed, and carries a tense smile that never quite reaches her eyes once the evening begins to unravel.",
+                        connectionToCase = "She managed the unveiling guests and spent the evening gliding between anxious donors, staff whispers, and the edge of the restoration wing.",
+                        lastSeenVictim = "She says she last saw Dr. Vale charming donors near the reception arch before he disappeared back toward the restoration side of the museum.",
+                        motive = "A failed unveiling would embarrass the donors she represented and leave her looking incompetent in front of the museum board.",
+                        alibi = "She says she was escorting patrons back to the reception hall when staff rushed to seal the wing.",
+                        personality = "Polished, anxious, and image-conscious",
+                        openingStatement = "Tonight was supposed to be flawless. I was smoothing over donor nerves while someone turned the museum into a scandal.",
+                        interrogationAnswers = new[]
                         {
-                            new FollowUpQuestion
-                            {
-                                question = "What did you see when you reached the restoration wing?",
-                                answer = "Dr. Vale was furious and the control room door was half open. I remember that because he kept shouting that someone had been inside before him."
-                            },
-                            new FollowUpQuestion
-                            {
-                                question = "Who had reason to target the unveiling?",
-                                answer = "Plenty of people hated Vale's decisions, but Mira took this transfer personally. She argued with him about it all week."
-                            }
+                            "I was in the public hall escorting two patrons back to reception. I heard the alarms before I saw any staff running.",
+                            "Because the unveiling was tied to donor trust. A disaster tonight lands on me too.",
+                            "Only what I heard from the staff afterward. Everyone kept saying the control room had been compromised.",
+                            "Mira took the transfer personally. She believed the painting should stay under her care."
                         }
                     },
                     new Suspect
@@ -148,113 +167,120 @@ namespace CaseFileLocalSuspect.Game
                         name = "Mira Sloane",
                         portraitId = "FemCharacter2",
                         role = "Lead conservator",
-                        connectionToCase = "She had worked on the damaged painting for months and opposed moving it after the unveiling.",
-                        motive = "She believed Dr. Vale was sacrificing the painting's safety for publicity.",
-                        alibi = "I stayed in the prep studio cataloguing solvents. By the time I heard the alarm, Jonah and Vale were already ahead of me.",
+                        description = "Mira Sloane speaks about the painting the way other people speak about family. Months of restoration had turned her protectiveness into obsession, and Dr. Vale's showmanship made that obsession dangerous.",
+                        appearance = "She is poised and sharply observant, with careful hands and a stare that lingers longest on anyone treating the painting like a prop.",
+                        connectionToCase = "She spent months restoring the painting and treated it less like museum property and more like something placed under her personal protection.",
+                        lastSeenVictim = "She says she last saw Dr. Vale in a heated exchange outside the restoration room, where he dismissed her warnings about the transfer schedule.",
+                        motive = "She believed Dr. Vale was gambling with the painting's safety for the sake of applause and prestige.",
+                        alibi = "She says she was cataloguing solvents in the prep studio when the alarms erupted through the wing.",
                         personality = "Measured, proud, and quietly resentful",
-                        openingStatement = "I cared more about that painting than anyone in the building. If someone damaged the environment around it, that someone was attacking my work too.",
-                        followUpQuestions = new[]
+                        openingStatement = "I cared more about that painting than anyone else in the building. Sabotaging the environment would mean attacking my own work.",
+                        interrogationAnswers = new[]
                         {
-                            new FollowUpQuestion
-                            {
-                                question = "Why were you arguing with Dr. Vale before the unveiling?",
-                                answer = "Because he was rushing a transfer I considered reckless. That was a professional disagreement, not sabotage."
-                            },
-                            new FollowUpQuestion
-                            {
-                                question = "How do you know what happened in the control room?",
-                                answer = "Only from what I heard afterward. The override panel was jammed, wasn't it? That is what everyone is whispering now."
-                            }
+                            "I was in the prep studio cataloguing solvents. By the time I came out, Vale and Jonah were already shouting.",
+                            "Because the transfer was reckless. Vale was treating restoration like a stage trick.",
+                            "Only rumors. The override panel was jammed, wasn't it? That is what people are whispering.",
+                            "Vale's decision angered me, yes, but Jonah had to answer for the system failure too."
                         }
                     },
                     new Suspect
                     {
-                        name = "Clara Benn",
-                        portraitId = "FemCharacter1",
-                        role = "Museum donor liaison",
-                        connectionToCase = "She organized the unveiling guests and was moving between the public hall and staff corridor all evening.",
-                        motive = "A failed unveiling would embarrass her donors and threaten her role.",
-                        alibi = "I was escorting two patrons back to the reception hall when the staff started closing doors around us.",
-                        personality = "Polished, anxious, and image-conscious",
-                        openingStatement = "Tonight was supposed to be flawless. I was trying to keep donors calm while your suspect turned a museum into a disaster scene.",
-                        followUpQuestions = new[]
+                        name = "Jonah Reed",
+                        portraitId = "MascCharacter2",
+                        role = "Night technician",
+                        description = "Jonah Reed is nervous in the way a man becomes when one more mistake might cost him everything. He knows the museum systems better than anyone in the wing, but he also knows that makes him an easy target the moment something goes wrong.",
+                        appearance = "He looks sleep-deprived and perpetually braced for blame, with grease on his sleeves and a habit of glancing toward every alarm before anyone else reacts.",
+                        connectionToCase = "He monitored the museum systems and was one of the first people close enough to hear the restoration alarms from the moment they triggered.",
+                        lastSeenVictim = "He says he last saw Dr. Vale earlier in the evening, complaining that maintenance delays were making him look foolish in front of donors.",
+                        motive = "Dr. Vale had already filed complaints about Jonah's missed maintenance logs and made it clear another mistake could cost him his job.",
+                        alibi = "He says he was tracing a lighting fault on the east staircase when the alarms began shrieking through the wing.",
+                        personality = "Nervous, practical, and eager to be believed",
+                        openingStatement = "I know the systems, sure, but that also means I knew how bad this was the second it started. I ran toward the alarms, not away from them.",
+                        interrogationAnswers = new[]
                         {
-                            new FollowUpQuestion
-                            {
-                                question = "Did you see anyone leaving the restoration wing?",
-                                answer = "I saw Mira come from that direction earlier, before the alarms. She looked upset, but I thought it was just another argument with Vale."
-                            },
-                            new FollowUpQuestion
-                            {
-                                question = "What was the atmosphere like before the sabotage?",
-                                answer = "Tense. Vale was playing showman, Mira was furious, and Jonah looked like he was trying not to be blamed for something before anything even happened."
-                            }
+                            "I was on the east staircase tracing a lighting fault. I reached the wing right after the alarms started.",
+                            "It mattered because Vale had already been blaming me for every maintenance problem this month.",
+                            "The control room door was half open when I got there, and the emergency override had been jammed on purpose.",
+                            "Mira argued with Vale all week about the transfer. She took it far more personally than Clara ever did."
                         }
                     }
-                }
+                },
+                guiltySuspect = "Mira Sloane",
+                guiltClues = new[]
+                {
+                    "Mira references the jammed override panel before that detail is publicly shared with her.",
+                    "The brass palette knife came from the conservator's tool set that Mira used daily."
+                },
+                explanation = "Mira Sloane sabotaged the climate control to stop the transfer she believed would endanger the painting. Her answer shows inside knowledge of the jammed override panel before investigators should have revealed it."
             };
         }
 
-        private static CaseFile CreateTheatreDisappearance()
+        private static CaseFile CreateTheatreMurder()
         {
             return new CaseFile
             {
-                caseTitle = "The Velvet Curtain Disappearance",
-                crime = "Minutes before opening night, the star performer vanished from the Grand Lyric Theatre and a ransom-style note was left in her dressing room.",
-                victim = "Celeste Dane",
-                victimPortraitId = "FemCharacter1",
-                location = "Grand Lyric Theatre, backstage level",
-                guiltySuspect = "Adrian Cross",
-                keyClue = "Adrian insists the note used plain stationery from the lobby desk, but only someone backstage knew the theatre had switched to embossed dressing-room cards for opening night.",
-                explanation = "Adrian Cross staged Celeste Dane's disappearance to force a last-minute promotion and sabotage her contract negotiations. His description of the note gives away that he handled the wrong stationery before the staff reported that detail.",
+                caseTitle = "The Grand Lyric Dressing Room Murder",
+                boardSummary = "A celebrated producer was found dead backstage on opening night. The theatre is packed with ambition, resentment, and one killer who knew exactly how to move unnoticed.",
+                victimDescription = "Adrian Vale was a gifted producer with a savage ego and a habit of turning creative pressure into personal cruelty. He inspired devotion when the spotlight was bright, but behind the curtain he had spent years humiliating the very people who kept his productions alive.",
+                crime = "Minutes before curtain, theatre producer Adrian Vale was found dead in a dressing room corridor at the Grand Lyric Theatre. Opening night froze in place as cast, crew, and staff were sealed backstage with the body and whatever secrets had just turned deadly.",
+                victim = "Adrian Vale",
+                victimPortraitId = "MascCharacter1",
+                location = "Grand Lyric Theatre, backstage corridor",
+                onSiteClues = new[]
+                {
+                    "A blood-specked cue sheet was folded into a lighting booth clipboard rather than left near the body.",
+                    "The victim's missing signet ring was later found inside a costume repair tin.",
+                    "Only staff with backstage access knew the corridor camera had failed during the five minutes before curtain."
+                },
+                interrogationQuestions = new[]
+                {
+                    "Where were you during the five minutes before curtain?",
+                    "Why did Adrian Vale create pressure for you personally?",
+                    "What did you notice about the backstage corridor after the commotion started?",
+                    "Who had the best chance to move through backstage without drawing attention?"
+                },
                 suspects = new[]
                 {
                     new Suspect
                     {
                         name = "Lena Morrell",
-                        portraitId = "FemCharacter2",
+                        portraitId = "FemCharacter1",
                         role = "Stage manager",
-                        connectionToCase = "She controlled backstage traffic and checked in every performer before curtain call.",
-                        motive = "Celeste's unpredictability kept putting opening night at risk and reflected badly on Lena.",
-                        alibi = "I was calling places from the cue desk when wardrobe reported Celeste missing from her dressing room.",
+                        description = "Lena Morrell runs backstage like a general holding a collapsing front line together by force of will alone. She knew Adrian's habits, his temper, and the terrible timing of every crisis he liked to create.",
+                        appearance = "She is sharp-featured, brisk, and permanently on the edge of exhaustion, with the posture of someone who has not sat down all day.",
+                        connectionToCase = "She controlled backstage traffic and coordinated the opening-night cues, making her one of the few people who always knew where everyone was supposed to be.",
+                        lastSeenVictim = "She says she last saw Adrian storming down the corridor toward the dressing rooms after barking at two actors and blaming everyone for the night's nerves.",
+                        motive = "Adrian had threatened to blame the entire evening on her if even the smallest detail slipped.",
+                        alibi = "She says she was calling places from the cue desk when the shouting burst through backstage.",
                         personality = "Sharp, overworked, and direct",
-                        openingStatement = "I needed that show to start on time, not collapse. If Celeste disappeared, she either trusted the wrong person or someone backstage knew exactly when to move.",
-                        followUpQuestions = new[]
+                        openingStatement = "I needed the show to start on time, not collapse into panic. If Adrian died backstage, someone used the exact moment the theatre was at its busiest.",
+                        interrogationAnswers = new[]
                         {
-                            new FollowUpQuestion
-                            {
-                                question = "Who had the easiest access to Celeste before the show?",
-                                answer = "Anyone with a backstage badge could get near her, but Adrian moved in and out of her hallway more than most. He always found a reason to linger."
-                            },
-                            new FollowUpQuestion
-                            {
-                                question = "What did you notice in the dressing room?",
-                                answer = "The note looked staged to me. Too neat, too convenient, and left where it would absolutely be found before curtain."
-                            }
+                            "I was at the cue desk calling places. Half the company can confirm they heard me over comms.",
+                            "Because Adrian weaponized pressure. He loved making everyone feel replaceable, especially on opening night.",
+                            "People flooded the corridor, but the lighting booth door was shut at first. That stood out because Noah usually kept it cracked.",
+                            "Noah could disappear into the tech side of backstage without anyone thinking twice."
                         }
                     },
                     new Suspect
                     {
-                        name = "Adrian Cross",
-                        portraitId = "MascCharacter1",
-                        role = "Understudy lead",
-                        connectionToCase = "He would inherit the starring role if Celeste could not perform.",
-                        motive = "Celeste's absence would put him in the spotlight he thought he deserved.",
-                        alibi = "I was in rehearsal room B warming up alone. Ask anyone who heard me running my second act lines through the wall.",
-                        personality = "Charming, ambitious, and slightly theatrical",
-                        openingStatement = "Everyone loves blaming the understudy because it fits the story. Yes, her disappearance benefits me on paper, but that does not mean I engineered it.",
-                        followUpQuestions = new[]
+                        name = "Iris Bell",
+                        portraitId = "FemCharacter2",
+                        role = "Costume supervisor",
+                        description = "Iris Bell has the protective fury of someone who has spent years stitching beauty together while others take credit for it. Adrian's contempt for her department had not made her forget a single slight.",
+                        appearance = "She is immaculate despite the chaos around her, with pinned-back hair, quick hands, and the sharp gaze of someone always spotting what is out of place.",
+                        connectionToCase = "She managed quick changes and had every excuse to move between dressing rooms, costume storage, and the narrow backstage corridors all evening.",
+                        lastSeenVictim = "She says she last saw Adrian in passing near wardrobe, mocking the delay on a costume repair before striding toward the dressing-room corridor.",
+                        motive = "Adrian had slashed her department budget and publicly humiliated her whenever wardrobe delays threatened his perfect production schedule.",
+                        alibi = "She says she was repairing a torn hem in wardrobe storage when the corridor erupted in noise.",
+                        personality = "Precise, protective, and simmering",
+                        openingStatement = "I was trying to stop opening night from falling apart one costume at a time. Adrian enjoyed humiliating people, but I was busy fixing his chaos, not adding to it.",
+                        interrogationAnswers = new[]
                         {
-                            new FollowUpQuestion
-                            {
-                                question = "What do you know about the note left behind?",
-                                answer = "Only that it looked rushed, like something scribbled on plain theatre stationery. Whoever did it wanted panic more than money."
-                            },
-                            new FollowUpQuestion
-                            {
-                                question = "How were things between you and Celeste this week?",
-                                answer = "Competitive, naturally. She knew I could carry the show if I had to, and she hated being reminded of that."
-                            }
+                            "I was in wardrobe storage fixing a hem. If you check the repair tin, my tools were there the whole time.",
+                            "Adrian made my work miserable, but he did that to everyone. He cut corners and expected us to smile.",
+                            "I noticed the corridor camera monitor was dark when people started yelling. I assumed tech was already dealing with it.",
+                            "Lena knew everyone's movements, but Noah had the easiest way to vanish into a booth or catwalk."
                         }
                     },
                     new Suspect
@@ -262,26 +288,30 @@ namespace CaseFileLocalSuspect.Game
                         name = "Noah Pike",
                         portraitId = "MascCharacter2",
                         role = "Lighting operator",
-                        connectionToCase = "He worked the catwalk and saw who moved through the backstage corridor before places were called.",
-                        motive = "Celeste had filed a complaint after Noah nearly dropped a spotlight cue during rehearsal.",
-                        alibi = "I was in the lighting booth finalizing cues when house management called for a hold on the audience entry.",
+                        description = "Noah Pike watches the theatre from above, half hidden in shadow and machinery, which has made him observant and difficult to read. He noticed more than he admitted, and Adrian had given him every reason to turn bitterness into action.",
+                        appearance = "He is lean, watchful, and unsmiling, with a technician's hands and the stillness of someone used to studying a room before entering it.",
+                        connectionToCase = "He worked the lighting booth and catwalk above the backstage corridor, close enough to watch the chaos from above and slip out of sight when needed.",
+                        lastSeenVictim = "He says he last saw Adrian below the booth, pacing the corridor alone and muttering about incompetence minutes before curtain.",
+                        motive = "Adrian planned to replace him after recent technical mistakes and had made sure Noah knew his place was hanging by a thread.",
+                        alibi = "He says he was finalizing lighting cues alone in the booth before curtain.",
                         personality = "Dry, observant, and hard to rattle",
-                        openingStatement = "I watch people for a living, even when they forget that. Backstage was chaos, but not random chaos. Somebody timed this.",
-                        followUpQuestions = new[]
+                        openingStatement = "I watch people for a living, even when they forget that. Backstage chaos is still patterned chaos, and Adrian made plenty of enemies.",
+                        interrogationAnswers = new[]
                         {
-                            new FollowUpQuestion
-                            {
-                                question = "Did you see anyone near Celeste's dressing room?",
-                                answer = "Adrian passed that corridor twice in ten minutes. The second time, he was moving fast and suddenly very interested in not being noticed."
-                            },
-                            new FollowUpQuestion
-                            {
-                                question = "Did Celeste seem likely to run away on her own?",
-                                answer = "No. She was difficult, not careless. If she vanished, someone either persuaded her out or cornered her at exactly the right moment."
-                            }
+                            "I was in the lighting booth finalizing cues. Nobody came in because I was already behind.",
+                            "Adrian wanted me gone after rehearsal mistakes. He made that very clear.",
+                            "The corridor went wild fast, and somebody stuffed a cue sheet into my booth clipboard. Strange place to hide evidence unless they wanted it found later.",
+                            "Iris moved all over backstage, but Lena had authority to go anywhere. That said, someone who knew about the dead corridor camera had a real edge."
                         }
                     }
-                }
+                },
+                guiltySuspect = "Noah Pike",
+                guiltClues = new[]
+                {
+                    "The bloody cue sheet was hidden in Noah's lighting booth clipboard, linking the crime to his workspace.",
+                    "Noah speaks casually about someone exploiting the failed corridor camera, knowledge limited to backstage technical staff."
+                },
+                explanation = "Noah Pike killed Adrian Vale to protect his job and then tried to bury the evidence inside the lighting booth clutter. His access to the failed camera window and the cue-sheet evidence tie the murder back to him."
             };
         }
     }

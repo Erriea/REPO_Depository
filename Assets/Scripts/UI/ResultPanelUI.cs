@@ -27,8 +27,10 @@ namespace CaseFileLocalSuspect.UI
 
             SetText(resultHeaderText, isCorrect ? "Correct Accusation" : "Incorrect Accusation");
             SetText(accusedSuspectText, $"You accused: {accusedSuspect.name}");
-            SetText(guiltySuspectText, $"Actual culprit: {caseFile.guiltySuspect}");
-            SetText(keyClueText, $"Key clue: {caseFile.keyClue}");
+            SetText(guiltySuspectText, isCorrect
+                ? $"Verdict: {caseFile.guiltySuspect} was the correct arrest."
+                : $"True criminal: {caseFile.guiltySuspect}");
+            SetText(keyClueText, BuildClueSummary(caseFile.guiltClues));
             SetText(explanationText, caseFile.explanation);
 
             if (guiltySuspectPortraitImage != null)
@@ -44,8 +46,18 @@ namespace CaseFileLocalSuspect.UI
         {
             if (gameManager != null)
             {
-                gameManager.StartNewCase();
+                gameManager.ReturnToMainMenu();
             }
+        }
+
+        private static string BuildClueSummary(string[] guiltClues)
+        {
+            if (guiltClues == null || guiltClues.Length == 0)
+            {
+                return "Clues that pointed to the culprit: None recorded.";
+            }
+
+            return "Clues that pointed to the culprit:\n- " + string.Join("\n- ", guiltClues);
         }
 
         private static Suspect FindGuiltySuspect(CaseFile caseFile)
