@@ -1,48 +1,106 @@
 # Project README
 
 ## Project Overview
-- `CaseFile: Local Suspect` is a Unity detective prototype with local Ollama integration.
-- Each round generates a crime, a victim, three suspects, two follow-up questions per suspect, a culprit, and a final explanation.
+- `CaseFile: Local Suspect` is a Unity detective game prototype powered by local Ollama case generation.
+- Each round gives the player one case, three suspects, a set of linked clues, a limited interrogation phase, and one final arrest decision.
+- The final version was refined directly around feedback on clarity, difficulty, presentation, and navigation.
 
 ## Final Gameplay Flow
 1. Open the main menu.
-2. Press `New Case`.
-3. Let Ollama generate a structured detective case.
-4. Read the case briefing.
-5. Select suspects and read their opening statements.
-6. Ask the two generated follow-up questions for each suspect.
-7. Accuse one suspect.
-8. Review the clue and explanation on the result screen.
+2. Choose either `New Case` or `Timed Case`.
+3. Wait for Ollama to generate a case, or let the game load a fallback case if generation fails.
+4. Review the `Crime Board` summary.
+5. Open `The Crime` to inspect the narrative setup, victim details, and on-site clues.
+6. Open `The Suspects` and review one suspect at a time.
+7. Open `Interrogation` and spend the `4` shared questions carefully across the suspects.
+8. Unlock or reach the `Arrest` screen.
+9. Select one suspect.
+10. Read the `Outcome` screen to see whether the arrest was correct and which clues pointed to the culprit.
+
+## Main Feedback Integrated
+The main feedback we chose to focus on was:
+- Giving the player clear key clues to solving the case.
+- Giving a limited amount of questions to be asked.
+- Adding a timer variant of gameplay for increased difficulty.
+- Creating an updated and more navigable UI.
+
+## How The Final Build Responds To That Feedback
+
+### 1. Clearer Key Clues
+- Cases are now structured so the player is given visible clues through the crime scene, suspect descriptions, and interrogation answers.
+- The outcome screen explains which clues pointed to the culprit.
+- Fallback cases were expanded so clue-based solving still works even without Ollama.
+
+### 2. Limited Questions
+- The old interrogation structure was replaced with `4` shared questions total.
+- Each question can only be used once for the whole case.
+- This means the player must decide which suspect is most worth questioning with each remaining prompt.
+
+### 3. Timer Variant
+- The main menu now includes a `Timed Case` option.
+- Timed mode gives the player `1 minute` to review the available evidence.
+- When time runs out, the player is forced to make an arrest based on what they managed to learn.
+
+### 4. Updated Navigable UI
+- The project was rebuilt into a clearer multi-panel structure:
+  - `Main Menu`
+  - `Crime Board`
+  - `The Crime`
+  - `The Suspects`
+  - `Interrogation`
+  - `Arrest`
+  - `Outcome`
+- The arrest button remains locked until the required investigation steps are completed in standard mode.
+- The suspect review screen now shows one suspect at a time so the information stays readable.
+- The game also includes visual loading feedback while waiting for Ollama.
+
+## Additional Improvements Added
+- Added fallback case content for the full gameplay loop, not just the summary screen.
+- Added improved background presentation using the detective-board art across the interface.
+- Added custom fonts for headings and body text.
+- Added main menu music, mode-specific gameplay music, click sound effects, and result sounds.
+- Added correct and incorrect outcome audio feedback.
+- Added a visible timer for timed mode.
+- Added safer Ollama failure messaging so the player understands when fallback content is being used.
 
 ## How To Run The Game
 1. Open the Unity project.
 2. Start Ollama locally.
-3. Make sure the model `llama3.2` is available.
+3. Make sure the model `llama3.2` is installed.
 4. Open `Assets/Scenes/MainScene.unity`.
 5. Press Play.
 
 ## Dependencies
 - Unity `6000.0.44f1`
 - Ollama
-- A local model such as `llama3.2`
+- A local Ollama model such as `llama3.2`
 
 ## Controls
-- Mouse for menu navigation and suspect selection.
-- Keyboard for entering `1` or `2` in the interrogation input box to choose a suspect’s generated follow-up question.
+- Mouse for all menu navigation, panel navigation, suspect selection, question selection, and arrest confirmation.
 
 ## LLM Feature Summary
-- Unity sends one local HTTP request to Ollama per new case.
-- Ollama returns structured JSON containing the full round data.
-- Unity parses the result and uses it to populate the UI and deduction loop.
+- Unity sends one structured local HTTP request to Ollama per new case.
+- Ollama returns JSON containing:
+  - case title
+  - board summary
+  - victim details
+  - crime details
+  - clues
+  - suspects
+  - interrogation questions and answers
+  - guilty suspect
+  - guilt clues
+  - explanation
+- Unity parses the response and uses it to populate the full deduction loop.
 
 ## Fallback Behaviour
-- If Ollama is unavailable or returns invalid data, the game loads a prepared fallback case instead.
-- Multiple fallback cases are included so the failure mode is still playable.
+- If Ollama is unavailable, slow, times out, or returns invalid case data, the game loads a fallback case.
+- Fallback cases contain enough information to play through the full investigation properly.
 
 ## Known Limitations
-- The first Ollama request may be slow while the model warms up.
-- Local models may still produce repetitive or weaker cases.
-- The current final design uses generated preset questions instead of unlimited free-text interrogation.
+- The first Ollama request may still be slower while the model warms up.
+- Generated cases may vary in quality depending on the model and local performance.
+- The project uses fixed portraits, so visual character representation is still more limited than a fully bespoke art pipeline.
 
 ## Project Documentation
 - `high-concept.md`
@@ -56,11 +114,12 @@
 
 ## AI Tools Used
 - Ollama for local LLM inference
-- Codex for development assistance, refactoring support, and documentation drafting
+- Codex for implementation support, UI rebuilding, debugging, audio/font integration, and documentation updates
 
 ## Credits
-- Custom background art and project assets supplied by the project owner unless otherwise noted in the repository.
+- Custom background art and project assets supplied by the project owner unless otherwise stated in the repository.
+- Additional local audio and font files were imported into the build during refinement.
 
 ## Licensing Notes
-- Ollama and the selected local model must be used according to their own licenses.
-- The project should clearly state in the final submission that AI-generated narrative content is used in gameplay.
+- Ollama and the chosen local model must be used according to their own licenses.
+- Imported fonts and audio assets should be credited and used according to their original license terms in the final submission if required.

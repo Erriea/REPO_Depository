@@ -16,6 +16,7 @@ namespace CaseFileLocalSuspect.Editor
     {
         private const string ScenePath = "Assets/Scenes/MainScene.unity";
         private const string BackgroundPath = "Assets/Art/Backgrounds/Background.png";
+        private const string ResultDecorationPath = "Assets/Art/Backgrounds/Charizard-Pokemon-Fire-Dragon.png";
         private const string Suspect1Path = "Assets/Art/Suspects/FemCharacter1.png";
         private const string Suspect2Path = "Assets/Art/Suspects/FemCharacter2.png";
         private const string VictimPath = "Assets/Art/Suspects/MascCharacter1.png";
@@ -42,6 +43,7 @@ namespace CaseFileLocalSuspect.Editor
         {
             AssetDatabase.Refresh();
             ConfigureSpriteImport(BackgroundPath);
+            ConfigureSpriteImport(ResultDecorationPath);
             ConfigureSpriteImport(Suspect1Path);
             ConfigureSpriteImport(Suspect2Path);
             ConfigureSpriteImport(VictimPath);
@@ -51,6 +53,7 @@ namespace CaseFileLocalSuspect.Editor
             bodyFontAsset = EnsureTmpFontAsset(TypoWriterFontPath, TypoWriterTmpFontPath);
 
             Sprite backgroundSprite = AssetDatabase.LoadAssetAtPath<Sprite>(BackgroundPath);
+            Sprite resultDecorationSprite = AssetDatabase.LoadAssetAtPath<Sprite>(ResultDecorationPath);
             panelBackdropSprite = backgroundSprite;
             Sprite femCharacter1 = AssetDatabase.LoadAssetAtPath<Sprite>(Suspect1Path);
             Sprite femCharacter2 = AssetDatabase.LoadAssetAtPath<Sprite>(Suspect2Path);
@@ -292,11 +295,17 @@ namespace CaseFileLocalSuspect.Editor
             ResultPanelUI resultUI = resultPanel.AddComponent<ResultPanelUI>();
             TMP_Text resultHeader = CreateHeadingText("ResultHeader", resultPanel.transform, "Outcome", 62, TextAlignmentOptions.Center, new Vector2(0.5f, 0.93f), new Vector2(1000f, 82f), new Color(0.97f, 0.91f, 0.74f));
             Image guiltyPortrait = CreateImage("GuiltyPortrait", resultPanel.transform, null, new Vector2(0.18f, 0.58f), new Vector2(320f, 400f), true);
+            Image resultDecorationLeft = CreateImage("ResultDecorationLeft", resultPanel.transform, resultDecorationSprite, new Vector2(0.14f, 0.11f), new Vector2(360f, 280f), true, Color.white);
+            Image resultDecorationRight = CreateImage("ResultDecorationRight", resultPanel.transform, resultDecorationSprite, new Vector2(0.86f, 0.11f), new Vector2(360f, 280f), true, Color.white);
+            resultDecorationLeft.raycastTarget = false;
+            resultDecorationRight.raycastTarget = false;
             TMP_Text accusedText = CreateText("AccusedText", resultPanel.transform, "You accused:", 28, TextAlignmentOptions.Left, new Vector2(0.60f, 0.77f), new Vector2(820f, 50f));
             TMP_Text guiltyText = CreateText("GuiltyText", resultPanel.transform, "Actual culprit:", 28, TextAlignmentOptions.Left, new Vector2(0.60f, 0.69f), new Vector2(820f, 70f));
             TMP_Text clueText = CreateText("ClueText", resultPanel.transform, "Clues", 24, TextAlignmentOptions.TopLeft, new Vector2(0.60f, 0.51f), new Vector2(820f, 150f), new Color(0.97f, 0.91f, 0.74f));
             TMP_Text explanationText = CreateText("ExplanationText", resultPanel.transform, "Explanation", 22, TextAlignmentOptions.TopLeft, new Vector2(0.60f, 0.28f), new Vector2(820f, 220f));
             Button resultMenuButton = CreateButton("ResultMenuButton", resultPanel.transform, "Main Menu", new Vector2(0.5f, 0.10f), new Vector2(280f, 76f));
+            resultDecorationLeft.transform.SetAsFirstSibling();
+            resultDecorationRight.transform.SetAsFirstSibling();
 
             GameObject gameManagerObject = new GameObject("GameManager");
             GameManager gameManager = gameManagerObject.AddComponent<GameManager>();

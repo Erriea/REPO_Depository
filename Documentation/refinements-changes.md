@@ -1,59 +1,125 @@
 # Refinements And Changes
 
-## Development Log
-- Milestone 1: created the Unity project structure and initial documentation set.
-- Milestone 2: built the first menu and panel flow for a text-first detective prototype.
-- Milestone 3: added case data classes, suspect cards, and a fallback case briefing flow.
-- Milestone 4: added Ollama HTTP integration and early generated case support.
-- Milestone 5: tested live suspect interrogation and found that repeated runtime calls were too fragile for the assignment timeline.
-- Milestone 6: rebuilt the project around one structured Ollama request per case.
-- Milestone 7: updated the UI flow so each suspect now has an opening statement plus two generated follow-up questions.
-- Milestone 8: improved fallback behavior, menu presentation, and assignment documentation.
+## Feedback Chosen To Integrate
+The main feedback selected for Part 2 refinement was:
+- Giving the player clear key clues to solving the case.
+- Giving a limited amount of questions to be asked.
+- Adding a timer variant of gameplay for increased difficulty.
+- Creating an updated and more navigable UI.
 
-## Scope Changes
-- The original free-text interrogation concept was reduced to a safer preset-question format.
-- This was the biggest design change in the project and was made to improve stability, demo reliability, and clarity.
+## Summary Of The Final Refinement Direction
+The project was reworked from a simpler suspect-question prototype into a fuller investigation loop with clearer navigation, stronger clue delivery, limited interrogation choices, and a new timed challenge mode. The final result is more visibly polished and more clearly aligned with the feedback goals.
 
-## AI-Assisted Decisions
-- Chose a small, UI-first vertical slice instead of a larger exploratory game.
-- Chose to move from repeated live inference to one structured generation request per case.
-- Chose to add structured JSON schema output to reduce parsing failures.
-- Chose to keep fallback cases so the project remains demoable even if the local model fails.
+## Feedback-Driven Changes
 
-## Bugs Encountered
-- Invalid or incomplete JSON responses from Ollama.
-- Repeated fallback use when the generated response did not match the parser.
-- UI layering issues on the start menu background.
-- Mismatch between generated character gender and fixed portrait order.
+### 1. Giving The Player Clear Key Clues To Solving The Case
+Changes made:
+- Expanded the `Crime Board` and `The Crime` screens so the player receives a clearer case summary and evidence trail.
+- Reworked generated and fallback case content so clues can point toward specific suspects instead of feeling random.
+- Updated suspect information and interrogation responses so they support the clue trail instead of contradicting it.
+- Updated the result screen so it explains which clues pointed toward the guilty suspect.
 
-## Fixes Made
-- Reworked the prompt to generate the entire round in one response.
-- Added structured output with a JSON schema.
-- Added clearer parsing rules and fallback handling.
-- Added multiple fallback cases instead of a single repeated case.
-- Forced the victim and suspect gender order to match the available portraits.
-- Repaired scene UI settings so the background art displays correctly.
+Why this matters:
+- The player now has a more understandable deduction path.
+- Solving the case feels more like interpreting evidence and less like guessing.
 
-## Prompt Improvements
-- Moved from a plain JSON prompt to a schema-backed structured output request.
-- Added exact suspect count and exact follow-up question count.
-- Added tone constraints and clue-solving rules.
-- Added a guard against repeating the previous case too closely.
+### 2. Giving A Limited Amount Of Questions To Be Asked
+Changes made:
+- Removed the older structure where each suspect effectively had their own small set of question opportunities.
+- Replaced it with `4` shared interrogation questions for the whole case.
+- Once a question is used on one suspect, it cannot be used again on another suspect.
 
-## Design Changes
-- The game remains one scene and text-first.
-- The core LLM feature now focuses on generated narrative packages rather than live improvisation.
-- This keeps the deduction experience while reducing failure points.
+Why this matters:
+- This makes interrogation more strategic.
+- The player must decide which suspect is worth each remaining question.
+- The mechanic directly increases difficulty in a controlled and visible way.
 
-## Technical Changes
-- Added `OllamaClient` for local HTTP requests.
-- Added `PromptBuilder` for the final structured generation prompt and schema.
-- Reworked `GameManager` to run one generation request per round.
-- Added `FollowUpQuestion` data support.
-- Updated suspect data to include opening statements and generated follow-up content.
-- Replaced the old fallback dialogue system with fallback full-case data.
+### 3. Adding A Timer Variant Of Gameplay For Increased Difficulty
+Changes made:
+- Added a second main menu option: `Timed Case`.
+- Added a visible countdown timer.
+- Set the timed mode to `1 minute`.
+- When time runs out, the game forces the player into the arrest screen.
+- Added special timed-out arrest messaging and presentation.
 
-## What Was Simplified And Why
-- Unlimited typed interrogation was removed because it introduced too much instability for a student prototype.
-- The final version still satisfies the assignment by making Ollama responsible for core gameplay content.
-- Simplifying the interaction model made the build easier to test, explain, and demonstrate professionally.
+Why this matters:
+- The timed mode introduces pressure without changing the core rules of the game.
+- It creates a more challenging version of the same investigation loop.
+
+### 4. Updated And More Navigable UI
+Changes made:
+- Rebuilt the flow into clear panels:
+  - `Main Menu`
+  - `Crime Board`
+  - `The Crime`
+  - `The Suspects`
+  - `Interrogation`
+  - `Arrest`
+  - `Outcome`
+- Added navigation back to the crime board from investigation screens.
+- Locked the arrest button in standard mode until the player has reviewed the required evidence.
+- Reworked suspect viewing into one-suspect-at-a-time navigation for readability.
+- Added a visible loading overlay while waiting for Ollama.
+- Improved layout spacing, text presentation, and background styling.
+
+Why this matters:
+- The game is easier to understand and demonstrate.
+- The interface better supports the investigation process.
+
+## Additional Improvements Added Beyond The Core Feedback
+
+### Audio
+- Added main menu music.
+- Added different gameplay music for normal and timed cases.
+- Added click sound effects for UI interaction.
+- Added applause for correct arrests and booing for incorrect arrests.
+
+### Fonts And Presentation
+- Added custom fonts for headings and body text.
+- Restyled the screens to better match the detective-board theme.
+- Added panel background treatment to strengthen the game’s visual identity.
+
+### Reliability And Playability
+- Expanded fallback case support across the whole game loop.
+- Improved Ollama failure handling and loading feedback.
+- Preserved full playability even when live generation fails.
+
+## Technical Changes Implemented
+- Rebuilt the scene structure through the editor scene builder.
+- Updated `GameManager` to support:
+  - standard mode
+  - timed mode
+  - forced arrest on timeout
+  - refreshed UI state handling
+- Updated `UIManager` to support timer display, screen flow, and music state control.
+- Added loading-state presentation on the crime board.
+- Added audio sources and clips for music, UI clicks, and result feedback.
+- Updated panel controllers to reflect the final navigation and investigation structure.
+
+## Problems Encountered During Refinement
+- Ollama timeouts and unstable output.
+- Generated clue logic that did not always connect clearly to suspects.
+- Layout overlap problems on suspects and interrogation screens.
+- Scene rebuild mismatches while iterating on Unity UI changes.
+- Font asset import issues with TMP.
+- Background image styling that needed multiple passes to display correctly.
+
+## How Those Problems Were Addressed
+- Added stronger fallback cases.
+- Reworked the prompts and output structure to better support clue relevance.
+- Rebuilt several UI layouts to improve readability.
+- Added automatic scene rebuilding to keep the edited scene in sync.
+- Recreated TMP font assets cleanly.
+- Rebalanced panel backgrounds and overlays so the detective-board art remains visible.
+
+## Visible Outcome In The Final Build
+The final build now shows targeted, visible refinements:
+- clearer clue-based deduction
+- limited shared interrogation choices
+- optional timed mode
+- improved screen-to-screen navigation
+- refined visual presentation
+- custom fonts and audio polish
+- stronger fallback reliability
+
+These changes directly reflect the feedback that was chosen for the refinement stage and are clearly visible in the final playable build.
