@@ -20,6 +20,12 @@ namespace CaseFileLocalSuspect.Editor
         private const string Suspect2Path = "Assets/Art/Suspects/FemCharacter2.png";
         private const string VictimPath = "Assets/Art/Suspects/MascCharacter1.png";
         private const string Suspect3Path = "Assets/Art/Suspects/MascCharacter2.png";
+        private const string MainMenuMusicPath = "Assets/Audio/Music/openmindaudio-true-crime-a-name-crossed-out-in-black-ink-short-preview-493031.mp3";
+        private const string NormalCaseMusicPath = "Assets/Audio/Music/zec53-quirky-awkward-detective-comedy-music-60-sec-499399.mp3";
+        private const string TimedCaseMusicPath = "Assets/Audio/Music/openmindaudio-dark-suspense-thriller-cue-488018.mp3";
+        private const string ButtonClickSfxPath = "Assets/Audio/SFX/soundreality-camera-shutter-171782.mp3";
+        private const string CorrectOutcomeSfxPath = "Assets/Audio/SFX/pwlpl-applause-sound-effect-521104.mp3";
+        private const string IncorrectOutcomeSfxPath = "Assets/Audio/SFX/dragon-studio-crowd-booing-494319.mp3";
         private const string DogtownFontPath = "Assets/Fonts/Dogtown/Dogtown Typewriter.ttf";
         private const string TypoWriterFontPath = "Assets/Fonts/TypoWriter/typo-writer.distressed-demo.otf";
         private const string DogtownTmpFontPath = "Assets/Fonts/Dogtown/Dogtown Typewriter TMP.asset";
@@ -28,6 +34,7 @@ namespace CaseFileLocalSuspect.Editor
 
         private static TMP_FontAsset headingFontAsset;
         private static TMP_FontAsset bodyFontAsset;
+        private static UIClickSoundPlayer clickSoundPlayer;
 
         [MenuItem("Tools/CaseFile/Build Assignment Scene")]
         public static void BuildAssignmentScene()
@@ -47,6 +54,12 @@ namespace CaseFileLocalSuspect.Editor
             Sprite femCharacter2 = AssetDatabase.LoadAssetAtPath<Sprite>(Suspect2Path);
             Sprite mascCharacter1 = AssetDatabase.LoadAssetAtPath<Sprite>(VictimPath);
             Sprite mascCharacter2 = AssetDatabase.LoadAssetAtPath<Sprite>(Suspect3Path);
+            AudioClip mainMenuMusicClip = AssetDatabase.LoadAssetAtPath<AudioClip>(MainMenuMusicPath);
+            AudioClip normalCaseMusicClip = AssetDatabase.LoadAssetAtPath<AudioClip>(NormalCaseMusicPath);
+            AudioClip timedCaseMusicClip = AssetDatabase.LoadAssetAtPath<AudioClip>(TimedCaseMusicPath);
+            AudioClip buttonClickSfx = AssetDatabase.LoadAssetAtPath<AudioClip>(ButtonClickSfxPath);
+            AudioClip correctOutcomeSfx = AssetDatabase.LoadAssetAtPath<AudioClip>(CorrectOutcomeSfxPath);
+            AudioClip incorrectOutcomeSfx = AssetDatabase.LoadAssetAtPath<AudioClip>(IncorrectOutcomeSfxPath);
 
             Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
 
@@ -67,6 +80,15 @@ namespace CaseFileLocalSuspect.Editor
             canvasScaler.matchWidthOrHeight = 0.5f;
 
             new GameObject("EventSystem", typeof(EventSystem), typeof(InputSystemUIInputModule));
+
+            GameObject uiClickAudioObject = new GameObject("UIClickAudio");
+            AudioSource uiClickAudioSource = uiClickAudioObject.AddComponent<AudioSource>();
+            uiClickAudioSource.playOnAwake = false;
+            uiClickAudioSource.loop = false;
+            uiClickAudioSource.volume = 1f;
+            clickSoundPlayer = uiClickAudioObject.AddComponent<UIClickSoundPlayer>();
+            SetSerializedReference(clickSoundPlayer, "audioSource", uiClickAudioSource);
+            SetSerializedReference(clickSoundPlayer, "clickClip", buttonClickSfx);
 
             GameObject backgroundObject = CreatePanel("Background", canvasObject.transform, new Color(0f, 0f, 0f, 0f));
             Image backgroundImage = backgroundObject.GetComponent<Image>();
@@ -100,6 +122,14 @@ namespace CaseFileLocalSuspect.Editor
             Button interrogationButton = CreateButton("InterrogationButton", crimeBoardPanel.transform, "Interrogation", new Vector2(0.62f, 0.18f), new Vector2(260f, 80f));
             Button arrestButton = CreateButton("ArrestButton", crimeBoardPanel.transform, "Arrest", new Vector2(0.82f, 0.18f), new Vector2(260f, 80f));
             Button boardMenuButton = CreateButton("BoardMenuButton", crimeBoardPanel.transform, "Main Menu", new Vector2(0.13f, 0.08f), new Vector2(220f, 64f));
+            GameObject loadingOverlay = CreatePanel("LoadingOverlay", crimeBoardPanel.transform, new Color(0.02f, 0.02f, 0.03f, 0.72f));
+            loadingOverlay.transform.SetAsLastSibling();
+            Image loadingOverlayImage = loadingOverlay.GetComponent<Image>();
+            loadingOverlayImage.raycastTarget = true;
+            TMP_Text loadingOverlayText = CreateHeadingText("LoadingOverlayText", loadingOverlay.transform, "Case Files Loading...", 44, TextAlignmentOptions.Center, new Vector2(0.5f, 0.54f), new Vector2(960f, 220f), new Color(0.97f, 0.91f, 0.74f));
+            loadingOverlayText.enableAutoSizing = false;
+            loadingOverlayText.fontSize = 34f;
+            loadingOverlay.SetActive(false);
 
             GameObject crimePanel = CreatePanel("CrimePanel", canvasObject.transform, new Color(0.08f, 0.07f, 0.06f, 0.8f));
             CrimeDetailsPanelUI crimeDetailsUI = crimePanel.AddComponent<CrimeDetailsPanelUI>();
@@ -267,6 +297,17 @@ namespace CaseFileLocalSuspect.Editor
             UIManager uiManager = uiManagerObject.AddComponent<UIManager>();
             GameObject portraitLibraryObject = new GameObject("PortraitLibrary");
             PortraitLibrary portraitLibrary = portraitLibraryObject.AddComponent<PortraitLibrary>();
+            GameObject menuMusicObject = new GameObject("MainMenuMusic");
+            AudioSource menuMusicSource = menuMusicObject.AddComponent<AudioSource>();
+            menuMusicSource.playOnAwake = false;
+            menuMusicSource.loop = true;
+            menuMusicSource.clip = mainMenuMusicClip;
+            menuMusicSource.volume = 0.45f;
+            GameObject resultAudioObject = new GameObject("ResultAudio");
+            AudioSource resultAudioSource = resultAudioObject.AddComponent<AudioSource>();
+            resultAudioSource.playOnAwake = false;
+            resultAudioSource.loop = false;
+            resultAudioSource.volume = 1f;
 
             SetPortraitLibrary(portraitLibrary, femCharacter1, femCharacter2, mascCharacter1, mascCharacter2);
 
@@ -285,6 +326,10 @@ namespace CaseFileLocalSuspect.Editor
             SetSerializedReference(uiManager, "accusationPanelUI", accusationUI);
             SetSerializedReference(uiManager, "resultPanelUI", resultUI);
             SetSerializedReference(uiManager, "timerText", timerText);
+            SetSerializedReference(uiManager, "musicSource", menuMusicSource);
+            SetSerializedReference(uiManager, "loadingMusicClip", mainMenuMusicClip);
+            SetSerializedReference(uiManager, "normalCaseMusicClip", normalCaseMusicClip);
+            SetSerializedReference(uiManager, "timedCaseMusicClip", timedCaseMusicClip);
             SetSerializedReference(gameManager, "uiManager", uiManager);
             SetSerializedReference(gameManager, "ollamaClient", ollamaClient);
 
@@ -293,6 +338,8 @@ namespace CaseFileLocalSuspect.Editor
             SetSerializedReference(crimeBoardUI, "progressText", boardProgress);
             SetSerializedReference(crimeBoardUI, "arrestStatusText", arrestStatus);
             SetSerializedReference(crimeBoardUI, "arrestButton", arrestButton);
+            SetSerializedReference(crimeBoardUI, "loadingOverlay", loadingOverlay);
+            SetSerializedReference(crimeBoardUI, "loadingOverlayText", loadingOverlayText);
 
             SetSerializedReference(crimeDetailsUI, "caseTitleText", crimeCaseTitle);
             SetSerializedReference(crimeDetailsUI, "locationText", locationText);
@@ -330,6 +377,9 @@ namespace CaseFileLocalSuspect.Editor
             SetSerializedReference(resultUI, "keyClueText", clueText);
             SetSerializedReference(resultUI, "explanationText", explanationText);
             SetSerializedReference(resultUI, "guiltySuspectPortraitImage", guiltyPortrait);
+            SetSerializedReference(resultUI, "outcomeAudioSource", resultAudioSource);
+            SetSerializedReference(resultUI, "correctOutcomeClip", correctOutcomeSfx);
+            SetSerializedReference(resultUI, "incorrectOutcomeClip", incorrectOutcomeSfx);
 
             for (int i = 0; i < interrogationButtons.Length; i++)
             {
@@ -513,6 +563,7 @@ namespace CaseFileLocalSuspect.Editor
             SetSerializedReference(choiceButtonUI, "labelText", label);
 
             AddButtonListener(button, choiceButtonUI, nameof(SuspectChoiceButtonUI.Press));
+            AddClickSound(button);
             return choiceButtonUI;
         }
 
@@ -541,6 +592,7 @@ namespace CaseFileLocalSuspect.Editor
             SetSerializedReference(questionButtonUI, "labelText", label);
 
             AddButtonListener(button, questionButtonUI, nameof(QuestionChoiceButtonUI.Press));
+            AddClickSound(button);
             return questionButtonUI;
         }
 
@@ -626,7 +678,18 @@ namespace CaseFileLocalSuspect.Editor
 
             TMP_Text labelText = CreateText("Label", buttonObject.transform, label, 28, TextAlignmentOptions.Center, new Vector2(0.5f, 0.5f), size - new Vector2(20f, 14f), new Color(0.97f, 0.91f, 0.74f));
             labelText.raycastTarget = false;
+            AddClickSound(button);
             return button;
+        }
+
+        private static void AddClickSound(Button button)
+        {
+            if (button == null || clickSoundPlayer == null)
+            {
+                return;
+            }
+
+            UnityEditor.Events.UnityEventTools.AddPersistentListener(button.onClick, clickSoundPlayer.PlayClick);
         }
 
         private static void StyleAccentButton(Button button)

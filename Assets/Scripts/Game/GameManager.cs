@@ -118,7 +118,7 @@ namespace CaseFileLocalSuspect.Game
             requiredGuiltySuspectIndex = generatedCaseCount % 3;
             int varietySeed = UnityEngine.Random.Range(1000, 999999);
             currentSystemMessage = "Generating a new case through Ollama. The first request may take a while if the model is still warming up.";
-            uiManager.ShowCrimeBoard(CreateLoadingCase(), false, false, false, false, QuestionCount, currentSystemMessage);
+            uiManager.ShowCrimeBoard(CreateLoadingCase(), false, false, false, false, QuestionCount, currentSystemMessage, true);
             ShowScreen(GameScreen.CrimeBoard);
             ollamaClient.GenerateStructuredJson(
                 PromptBuilder.BuildCaseGenerationPrompt(generatedCaseCount, varietySeed, previousCaseTitle, previousGuiltySuspectIndex, requiredGuiltySuspectIndex),
@@ -326,6 +326,7 @@ namespace CaseFileLocalSuspect.Game
 
             uiManager.ShowScreen(screen);
             RefreshTimedCaseUI();
+            RefreshMusicState();
         }
 
         private void RefreshCrimeBoardUI()
@@ -337,7 +338,8 @@ namespace CaseFileLocalSuspect.Game
                 completedInterrogationStep,
                 IsArrestUnlocked(),
                 GetRemainingQuestionCount(),
-                BuildSystemMessage());
+                BuildSystemMessage(),
+                false);
         }
 
         private void RefreshInterrogationUI()
@@ -851,6 +853,16 @@ namespace CaseFileLocalSuspect.Game
                 : $"{FormatTimer(timedCaseRemainingSeconds)} Left";
             bool urgent = timedCaseExpired || timedCaseRemainingSeconds <= 30f;
             uiManager.ShowTimer(true, timerText, urgent);
+        }
+
+        private void RefreshMusicState()
+        {
+            if (uiManager == null)
+            {
+                return;
+            }
+
+            uiManager.UpdateMusicForState(isGeneratingCase, HasCase(), isTimedMode || requestedTimedMode, CurrentScreen);
         }
 
         private static string FormatTimer(float secondsRemaining)

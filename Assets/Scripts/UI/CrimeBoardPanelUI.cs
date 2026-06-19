@@ -12,8 +12,10 @@ namespace CaseFileLocalSuspect.UI
         [SerializeField] private TMP_Text progressText;
         [SerializeField] private TMP_Text arrestStatusText;
         [SerializeField] private Button arrestButton;
+        [SerializeField] private GameObject loadingOverlay;
+        [SerializeField] private TMP_Text loadingOverlayText;
 
-        public void ShowState(CaseFile caseFile, bool viewedCrime, bool viewedSuspects, bool completedInterrogation, bool arrestUnlocked, int questionsRemaining, string systemMessage)
+        public void ShowState(CaseFile caseFile, bool viewedCrime, bool viewedSuspects, bool completedInterrogation, bool arrestUnlocked, int questionsRemaining, string systemMessage, bool isLoadingCase)
         {
             SetText(caseTitleText, caseFile != null ? caseFile.caseTitle : "No Case Loaded");
             SetText(summaryText, caseFile != null ? caseFile.boardSummary : "Start a new case to begin your investigation.");
@@ -33,6 +35,18 @@ namespace CaseFileLocalSuspect.UI
             if (arrestButton != null)
             {
                 arrestButton.interactable = arrestUnlocked;
+            }
+
+            if (loadingOverlay != null)
+            {
+                loadingOverlay.SetActive(isLoadingCase);
+            }
+
+            if (loadingOverlayText != null)
+            {
+                loadingOverlayText.text = isLoadingCase
+                    ? "Case Files Loading...\nConsulting Ollama, reviewing witness notes, and pinning fresh evidence to the board."
+                    : string.Empty;
             }
         }
 

@@ -14,6 +14,10 @@ namespace CaseFileLocalSuspect.UI
         [SerializeField] private TMP_Text keyClueText;
         [SerializeField] private TMP_Text explanationText;
         [SerializeField] private Image guiltySuspectPortraitImage;
+        [SerializeField] private AudioSource outcomeAudioSource;
+        [SerializeField] private AudioClip correctOutcomeClip;
+        [SerializeField] private AudioClip incorrectOutcomeClip;
+        [SerializeField] [Range(0f, 1f)] private float outcomeVolume = 0.9f;
 
         public void ShowResult(CaseFile caseFile, PortraitLibrary portraitLibrary, int accusedIndex, bool isCorrect)
         {
@@ -40,6 +44,8 @@ namespace CaseFileLocalSuspect.UI
                     : null;
                 guiltySuspectPortraitImage.enabled = guiltySuspectPortraitImage.sprite != null;
             }
+
+            PlayOutcomeSound(isCorrect);
         }
 
         public void StartNewCasePressed()
@@ -79,6 +85,23 @@ namespace CaseFileLocalSuspect.UI
             {
                 textField.text = value;
             }
+        }
+
+        private void PlayOutcomeSound(bool isCorrect)
+        {
+            if (outcomeAudioSource == null)
+            {
+                return;
+            }
+
+            AudioClip clip = isCorrect ? correctOutcomeClip : incorrectOutcomeClip;
+            if (clip == null)
+            {
+                return;
+            }
+
+            outcomeAudioSource.Stop();
+            outcomeAudioSource.PlayOneShot(clip, outcomeVolume);
         }
     }
 }

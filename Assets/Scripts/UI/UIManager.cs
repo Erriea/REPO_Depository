@@ -15,6 +15,10 @@ namespace CaseFileLocalSuspect.UI
         [SerializeField] private GameObject arrestPanel;
         [SerializeField] private GameObject resultPanel;
         [SerializeField] private TMP_Text timerText;
+        [SerializeField] private AudioSource musicSource;
+        [SerializeField] private AudioClip loadingMusicClip;
+        [SerializeField] private AudioClip normalCaseMusicClip;
+        [SerializeField] private AudioClip timedCaseMusicClip;
 
         [Header("Panel Controllers")]
         [SerializeField] private PortraitLibrary portraitLibrary;
@@ -38,11 +42,11 @@ namespace CaseFileLocalSuspect.UI
             SetPanelActive(resultPanel, screen == GameScreen.Result);
         }
 
-        public void ShowCrimeBoard(CaseFile caseFile, bool viewedCrime, bool viewedSuspects, bool completedInterrogation, bool arrestUnlocked, int questionsRemaining, string systemMessage)
+        public void ShowCrimeBoard(CaseFile caseFile, bool viewedCrime, bool viewedSuspects, bool completedInterrogation, bool arrestUnlocked, int questionsRemaining, string systemMessage, bool isLoadingCase = false)
         {
             if (crimeBoardPanelUI != null)
             {
-                crimeBoardPanelUI.ShowState(caseFile, viewedCrime, viewedSuspects, completedInterrogation, arrestUnlocked, questionsRemaining, systemMessage);
+                crimeBoardPanelUI.ShowState(caseFile, viewedCrime, viewedSuspects, completedInterrogation, arrestUnlocked, questionsRemaining, systemMessage, isLoadingCase);
             }
         }
 
@@ -104,6 +108,52 @@ namespace CaseFileLocalSuspect.UI
             timerText.gameObject.SetActive(isVisible);
             timerText.text = message;
             timerText.color = isUrgent ? timerUrgentColor : timerNormalColor;
+        }
+
+        public void UpdateMusicForState(bool isGeneratingCase, bool hasCase, bool isTimedMode, GameScreen screen)
+        {
+            if (musicSource == null)
+            {
+                return;
+            }
+
+            AudioClip targetClip = null;
+
+            if (screen == GameScreen.MainMenu || isGeneratingCase || !hasCase)
+            {
+                targetClip = loadingMusicClip;
+            }
+            else if (isTimedMode)
+            {
+                targetClip = timedCaseMusicClip;
+            }
+            else
+            {
+                targetClip = normalCaseMusicClip;
+            }
+
+            if (targetClip == null)
+            {
+                if (musicSource.isPlaying)
+                {
+                    musicSource.Stop();
+                }
+
+                musicSource.clip = null;
+                return;
+            }
+
+            if (musicSource.clip != targetClip)
+            {
+                musicSource.Stop();
+                musicSource.clip = targetClip;
+            }
+
+            if (!musicSource.isPlaying)
+            {
+                musicSource.loop = true;
+                musicSource.Play();
+            }
         }
 
         private static void SetPanelActive(GameObject panel, bool isActive)
