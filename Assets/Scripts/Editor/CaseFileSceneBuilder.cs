@@ -35,6 +35,7 @@ namespace CaseFileLocalSuspect.Editor
         private static TMP_FontAsset headingFontAsset;
         private static TMP_FontAsset bodyFontAsset;
         private static UIClickSoundPlayer clickSoundPlayer;
+        private static Sprite panelBackdropSprite;
 
         [MenuItem("Tools/CaseFile/Build Assignment Scene")]
         public static void BuildAssignmentScene()
@@ -50,6 +51,7 @@ namespace CaseFileLocalSuspect.Editor
             bodyFontAsset = EnsureTmpFontAsset(TypoWriterFontPath, TypoWriterTmpFontPath);
 
             Sprite backgroundSprite = AssetDatabase.LoadAssetAtPath<Sprite>(BackgroundPath);
+            panelBackdropSprite = backgroundSprite;
             Sprite femCharacter1 = AssetDatabase.LoadAssetAtPath<Sprite>(Suspect1Path);
             Sprite femCharacter2 = AssetDatabase.LoadAssetAtPath<Sprite>(Suspect2Path);
             Sprite mascCharacter1 = AssetDatabase.LoadAssetAtPath<Sprite>(VictimPath);
@@ -96,10 +98,11 @@ namespace CaseFileLocalSuspect.Editor
             backgroundImage.preserveAspect = false;
             backgroundImage.raycastTarget = false;
 
-            GameObject overlayObject = CreatePanel("Overlay", canvasObject.transform, new Color(0.05f, 0.05f, 0.06f, 0.55f));
+            GameObject overlayObject = CreatePanel("Overlay", canvasObject.transform, new Color(0.06f, 0.06f, 0.07f, 0.32f));
             overlayObject.GetComponent<Image>().raycastTarget = false;
 
             GameObject mainMenuPanel = CreatePanel("MainMenuPanel", canvasObject.transform, new Color(0f, 0f, 0f, 0f));
+            ApplyBoardPanelBackdrop(mainMenuPanel, new Color(0.36f, 0.36f, 0.36f, 0.88f), new Vector2(1680f, 900f));
             CreateHeadingText("MenuTitle", mainMenuPanel.transform, "CaseFile: Local Suspect", 84, TextAlignmentOptions.Center, new Vector2(0.5f, 0.82f), new Vector2(1200f, 120f));
             CreateText("MenuSubtitle", mainMenuPanel.transform, "Review the board, inspect the evidence, spend your questions wisely, and make the arrest.", 30, TextAlignmentOptions.Center, new Vector2(0.5f, 0.70f), new Vector2(1240f, 90f), new Color(0.92f, 0.84f, 0.68f));
             Button newCaseButton = CreateButton("NewCaseButton", mainMenuPanel.transform, "New Case", new Vector2(0.5f, 0.54f), new Vector2(360f, 86f));
@@ -110,7 +113,8 @@ namespace CaseFileLocalSuspect.Editor
             timerText.enableAutoSizing = false;
             timerText.gameObject.SetActive(false);
 
-            GameObject crimeBoardPanel = CreatePanel("CrimeBoardPanel", canvasObject.transform, new Color(0.08f, 0.07f, 0.06f, 0.78f));
+            GameObject crimeBoardPanel = CreatePanel("CrimeBoardPanel", canvasObject.transform, new Color(0f, 0f, 0f, 0f));
+            ApplyBoardPanelBackdrop(crimeBoardPanel, new Color(0.23f, 0.22f, 0.22f, 0.72f), new Vector2(1760f, 940f));
             CrimeBoardPanelUI crimeBoardUI = crimeBoardPanel.AddComponent<CrimeBoardPanelUI>();
             CreateHeadingText("BoardHeading", crimeBoardPanel.transform, "Crime Board", 64, TextAlignmentOptions.Center, new Vector2(0.5f, 0.94f), new Vector2(1000f, 80f), new Color(0.97f, 0.91f, 0.74f));
             TMP_Text boardCaseTitle = CreateHeadingText("BoardCaseTitle", crimeBoardPanel.transform, "Case Title", 42, TextAlignmentOptions.Center, new Vector2(0.5f, 0.86f), new Vector2(1300f, 70f));
@@ -131,7 +135,8 @@ namespace CaseFileLocalSuspect.Editor
             loadingOverlayText.fontSize = 34f;
             loadingOverlay.SetActive(false);
 
-            GameObject crimePanel = CreatePanel("CrimePanel", canvasObject.transform, new Color(0.08f, 0.07f, 0.06f, 0.8f));
+            GameObject crimePanel = CreatePanel("CrimePanel", canvasObject.transform, new Color(0f, 0f, 0f, 0f));
+            ApplyBoardPanelBackdrop(crimePanel, new Color(0.23f, 0.22f, 0.22f, 0.72f), new Vector2(1760f, 940f));
             CrimeDetailsPanelUI crimeDetailsUI = crimePanel.AddComponent<CrimeDetailsPanelUI>();
             CreateHeadingText("CrimeHeading", crimePanel.transform, "The Crime", 60, TextAlignmentOptions.Center, new Vector2(0.5f, 0.94f), new Vector2(1000f, 80f), new Color(0.97f, 0.91f, 0.74f));
             TMP_Text crimeCaseTitle = CreateHeadingText("CrimeCaseTitle", crimePanel.transform, "Case Title", 40, TextAlignmentOptions.Center, new Vector2(0.5f, 0.87f), new Vector2(1200f, 60f));
@@ -153,16 +158,17 @@ namespace CaseFileLocalSuspect.Editor
             suspectsSummaryText.fontSize = 18f;
             Button crimeBackButton = CreateButton("CrimeBackButton", crimePanel.transform, "Back to Board", new Vector2(0.16f, 0.08f), new Vector2(240f, 64f));
 
-            GameObject suspectsPanel = CreatePanel("SuspectsPanel", canvasObject.transform, new Color(0.08f, 0.07f, 0.06f, 0.8f));
+            GameObject suspectsPanel = CreatePanel("SuspectsPanel", canvasObject.transform, new Color(0f, 0f, 0f, 0f));
+            ApplyBoardPanelBackdrop(suspectsPanel, new Color(0.23f, 0.22f, 0.22f, 0.70f), new Vector2(1760f, 940f));
             SuspectsPanelUI suspectsUI = suspectsPanel.AddComponent<SuspectsPanelUI>();
             CreateHeadingText("SuspectsHeading", suspectsPanel.transform, "The Suspects", 60, TextAlignmentOptions.Center, new Vector2(0.5f, 0.94f), new Vector2(1000f, 80f), new Color(0.97f, 0.91f, 0.74f));
             CreateText("SuspectsInstruction", suspectsPanel.transform, "Review one suspect at a time so the details stay readable.", 22, TextAlignmentOptions.Center, new Vector2(0.5f, 0.85f), new Vector2(900f, 40f), new Color(0.92f, 0.84f, 0.68f));
-            GameObject suspectCardObject = CreatePanel("SuspectDetailCard", suspectsPanel.transform, new Color(0.11f, 0.11f, 0.10f, 0.95f));
+            GameObject suspectCardObject = CreatePanel("SuspectDetailCard", suspectsPanel.transform, new Color(0.10f, 0.10f, 0.10f, 0.78f));
             SetAnchoredRect(suspectCardObject.GetComponent<RectTransform>(), new Vector2(0.5f, 0.48f), new Vector2(940f, 760f));
             SuspectCardUI suspectCard = suspectCardObject.AddComponent<SuspectCardUI>();
             Image suspectPortrait = CreateImage("Portrait", suspectCardObject.transform, null, new Vector2(0.5f, 0.84f), new Vector2(220f, 220f), true);
             TMP_Text suspectNameText = CreateHeadingText("NameText", suspectCardObject.transform, "Suspect", 40, TextAlignmentOptions.Center, new Vector2(0.5f, 0.68f), new Vector2(700f, 54f), new Color(0.97f, 0.91f, 0.74f));
-            GameObject profilePanel = CreatePanel("ProfilePanel", suspectCardObject.transform, new Color(0.14f, 0.14f, 0.13f, 0.95f));
+            GameObject profilePanel = CreatePanel("ProfilePanel", suspectCardObject.transform, new Color(0.14f, 0.14f, 0.13f, 0.92f));
             SetAnchoredRect(profilePanel.GetComponent<RectTransform>(), new Vector2(0.28f, 0.42f), new Vector2(360f, 220f));
             TMP_Text suspectDescriptionText = CreateText("SuspectDescriptionText", profilePanel.transform, "Description", 18, TextAlignmentOptions.TopLeft, new Vector2(0.5f, 0.5f), new Vector2(320f, 180f));
             suspectDescriptionText.enableAutoSizing = true;
@@ -170,7 +176,7 @@ namespace CaseFileLocalSuspect.Editor
             suspectDescriptionText.fontSizeMin = 13f;
             suspectDescriptionText.overflowMode = TextOverflowModes.Overflow;
 
-            GameObject appearancePanel = CreatePanel("AppearancePanel", suspectCardObject.transform, new Color(0.14f, 0.14f, 0.13f, 0.95f));
+            GameObject appearancePanel = CreatePanel("AppearancePanel", suspectCardObject.transform, new Color(0.14f, 0.14f, 0.13f, 0.92f));
             SetAnchoredRect(appearancePanel.GetComponent<RectTransform>(), new Vector2(0.72f, 0.42f), new Vector2(360f, 220f));
             TMP_Text suspectAppearanceText = CreateText("SuspectAppearanceText", appearancePanel.transform, "Appearance", 18, TextAlignmentOptions.TopLeft, new Vector2(0.5f, 0.5f), new Vector2(320f, 180f));
             suspectAppearanceText.enableAutoSizing = true;
@@ -178,7 +184,7 @@ namespace CaseFileLocalSuspect.Editor
             suspectAppearanceText.fontSizeMin = 13f;
             suspectAppearanceText.overflowMode = TextOverflowModes.Overflow;
 
-            GameObject casePanel = CreatePanel("CasePanel", suspectCardObject.transform, new Color(0.14f, 0.14f, 0.13f, 0.95f));
+            GameObject casePanel = CreatePanel("CasePanel", suspectCardObject.transform, new Color(0.14f, 0.14f, 0.13f, 0.92f));
             SetAnchoredRect(casePanel.GetComponent<RectTransform>(), new Vector2(0.28f, 0.19f), new Vector2(360f, 180f));
             TMP_Text suspectCaseText = CreateText("SuspectCaseText", casePanel.transform, "Case Notes", 18, TextAlignmentOptions.TopLeft, new Vector2(0.5f, 0.5f), new Vector2(320f, 140f));
             suspectCaseText.enableAutoSizing = true;
@@ -186,7 +192,7 @@ namespace CaseFileLocalSuspect.Editor
             suspectCaseText.fontSizeMin = 13f;
             suspectCaseText.overflowMode = TextOverflowModes.Overflow;
 
-            GameObject motivePanel = CreatePanel("MotivePanel", suspectCardObject.transform, new Color(0.14f, 0.14f, 0.13f, 0.95f));
+            GameObject motivePanel = CreatePanel("MotivePanel", suspectCardObject.transform, new Color(0.14f, 0.14f, 0.13f, 0.92f));
             SetAnchoredRect(motivePanel.GetComponent<RectTransform>(), new Vector2(0.72f, 0.19f), new Vector2(360f, 180f));
             TMP_Text suspectMotiveText = CreateText("SuspectMotiveText", motivePanel.transform, "Motive", 18, TextAlignmentOptions.TopLeft, new Vector2(0.5f, 0.5f), new Vector2(320f, 140f));
             suspectMotiveText.enableAutoSizing = true;
@@ -205,7 +211,8 @@ namespace CaseFileLocalSuspect.Editor
             StyleAccentButton(previousSuspectButton);
             StyleAccentButton(nextSuspectButton);
 
-            GameObject interrogationPanel = CreatePanel("InterrogationPanel", canvasObject.transform, new Color(0.08f, 0.08f, 0.09f, 0.8f));
+            GameObject interrogationPanel = CreatePanel("InterrogationPanel", canvasObject.transform, new Color(0f, 0f, 0f, 0f));
+            ApplyBoardPanelBackdrop(interrogationPanel, new Color(0.23f, 0.23f, 0.24f, 0.72f), new Vector2(1760f, 940f));
             InterrogationPanelUI interrogationUI = interrogationPanel.AddComponent<InterrogationPanelUI>();
             CreateHeadingText("InterrogationHeading", interrogationPanel.transform, "Interrogation", 60, TextAlignmentOptions.Center, new Vector2(0.5f, 0.94f), new Vector2(1000f, 80f), new Color(0.97f, 0.91f, 0.74f));
             SuspectChoiceButtonUI[] interrogationButtons = new SuspectChoiceButtonUI[3];
@@ -266,7 +273,8 @@ namespace CaseFileLocalSuspect.Editor
             }
             Button interrogationBackButton = CreateButton("InterrogationBackButton", interrogationPanel.transform, "Back to Board", new Vector2(0.16f, 0.08f), new Vector2(240f, 64f));
 
-            GameObject arrestPanel = CreatePanel("ArrestPanel", canvasObject.transform, new Color(0.08f, 0.07f, 0.07f, 0.82f));
+            GameObject arrestPanel = CreatePanel("ArrestPanel", canvasObject.transform, new Color(0f, 0f, 0f, 0f));
+            ApplyBoardPanelBackdrop(arrestPanel, new Color(0.23f, 0.22f, 0.23f, 0.72f), new Vector2(1760f, 940f));
             AccusationPanelUI accusationUI = arrestPanel.AddComponent<AccusationPanelUI>();
             TMP_Text accusationPrompt = CreateHeadingText("PromptText", arrestPanel.transform, "Choose the suspect you want to arrest.", 40, TextAlignmentOptions.Center, new Vector2(0.5f, 0.90f), new Vector2(1300f, 120f));
             SuspectChoiceButtonUI[] accusationButtons = new SuspectChoiceButtonUI[3];
@@ -279,7 +287,8 @@ namespace CaseFileLocalSuspect.Editor
             Button confirmAccusationButton = CreateButton("ConfirmAccusationButton", arrestPanel.transform, "Confirm Arrest", new Vector2(0.68f, 0.12f), new Vector2(330f, 76f));
             Button backToBoardButton = CreateButton("BackButton", arrestPanel.transform, "Back to Board", new Vector2(0.32f, 0.12f), new Vector2(240f, 76f));
 
-            GameObject resultPanel = CreatePanel("ResultPanel", canvasObject.transform, new Color(0.06f, 0.06f, 0.06f, 0.84f));
+            GameObject resultPanel = CreatePanel("ResultPanel", canvasObject.transform, new Color(0f, 0f, 0f, 0f));
+            ApplyBoardPanelBackdrop(resultPanel, new Color(0.22f, 0.22f, 0.23f, 0.72f), new Vector2(1760f, 940f));
             ResultPanelUI resultUI = resultPanel.AddComponent<ResultPanelUI>();
             TMP_Text resultHeader = CreateHeadingText("ResultHeader", resultPanel.transform, "Outcome", 62, TextAlignmentOptions.Center, new Vector2(0.5f, 0.93f), new Vector2(1000f, 82f), new Color(0.97f, 0.91f, 0.74f));
             Image guiltyPortrait = CreateImage("GuiltyPortrait", resultPanel.transform, null, new Vector2(0.18f, 0.58f), new Vector2(320f, 400f), true);
@@ -607,6 +616,48 @@ namespace CaseFileLocalSuspect.Editor
             rectTransform.offsetMax = Vector2.zero;
             panel.GetComponent<Image>().color = color;
             return panel;
+        }
+
+        private static void ApplyBoardPanelBackdrop(GameObject panel, Color tint, Vector2? insetSize)
+        {
+            if (panel == null || panelBackdropSprite == null)
+            {
+                return;
+            }
+
+            Image panelImage = panel.GetComponent<Image>();
+            if (panelImage != null)
+            {
+                panelImage.color = Color.clear;
+                panelImage.sprite = null;
+            }
+
+            GameObject backdropObject = new GameObject("PanelBackdrop", typeof(RectTransform), typeof(Image));
+            backdropObject.transform.SetParent(panel.transform, false);
+            backdropObject.transform.SetAsFirstSibling();
+
+            RectTransform backdropRect = backdropObject.GetComponent<RectTransform>();
+            if (insetSize.HasValue)
+            {
+                backdropRect.anchorMin = new Vector2(0.5f, 0.5f);
+                backdropRect.anchorMax = new Vector2(0.5f, 0.5f);
+                backdropRect.anchoredPosition = Vector2.zero;
+                backdropRect.sizeDelta = insetSize.Value;
+            }
+            else
+            {
+                backdropRect.anchorMin = Vector2.zero;
+                backdropRect.anchorMax = Vector2.one;
+                backdropRect.offsetMin = Vector2.zero;
+                backdropRect.offsetMax = Vector2.zero;
+            }
+
+            Image backdropImage = backdropObject.GetComponent<Image>();
+            backdropImage.sprite = panelBackdropSprite;
+            backdropImage.type = Image.Type.Simple;
+            backdropImage.preserveAspect = false;
+            backdropImage.color = tint;
+            backdropImage.raycastTarget = false;
         }
 
         private static TMP_Text CreateHeadingText(string name, Transform parent, string text, float fontSize, TextAlignmentOptions alignment, Vector2 anchor, Vector2 size, Color? color = null)

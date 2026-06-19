@@ -6,7 +6,7 @@ namespace CaseFileLocalSuspect.Editor
     [InitializeOnLoad]
     public static class CodexSceneAutoRebuilder
     {
-        private const string SessionKey = "CaseFileLocalSuspect.CodexSceneAutoRebuilder.ResultOutcomeSfx";
+        private const string SessionKey = "CaseFileLocalSuspect.CodexSceneAutoRebuilder.MainMenuLightenSuspectCleanup";
 
         static CodexSceneAutoRebuilder()
         {
